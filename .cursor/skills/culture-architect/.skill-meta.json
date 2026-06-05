@@ -1,0 +1,13 @@
+{
+  "sourceType": "github",
+  "source": "github",
+  "url": "https://github.com/alirezarezvani/claude-skills",
+  "repo": "alirezarezvani/claude-skills",
+  "ref": null,
+  "subpath": "c-level-advisor/skills/culture-architect",
+  "installSource": "alirezarezvani/claude-skills/c-level-advisor/skills/culture-architect",
+  "skillName": "culture-architect",
+  "scope": "legacy",
+  "installedAt": "2026-05-27T16:42:21.823Z",
+  "updatedAt": "2026-05-27T16:42:21.823Z"
+}

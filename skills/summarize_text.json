@@ -1,0 +1,11 @@
+{
+  "name": "summarize_text",
+  "description": "Summarize a given text into key points. Returns a condensed version.",
+  "parameters": {
+    "text": {"type": "string", "description": "Text to summarize"},
+    "max_sentences": {"type": "integer", "description": "Max sentences in summary", "default": 5}
+  },
+  "required": ["text"],
+  "tags": ["text", "processing"],
+  "safe": true
+}

@@ -1,0 +1,13 @@
+{
+  "sourceType": "github",
+  "source": "github",
+  "url": "https://github.com/alirezarezvani/claude-skills",
+  "repo": "alirezarezvani/claude-skills",
+  "ref": null,
+  "subpath": "c-level-advisor/skills/ma-playbook",
+  "installSource": "alirezarezvani/claude-skills/c-level-advisor/skills/ma-playbook",
+  "skillName": "ma-playbook",
+  "scope": "legacy",
+  "installedAt": "2026-05-27T16:42:21.829Z",
+  "updatedAt": "2026-05-27T16:42:21.829Z"
+}

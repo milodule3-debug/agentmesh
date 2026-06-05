@@ -1,0 +1,1867 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lean Progress IQ — Dušan Milosavljević · English, Lean &amp; AI builds</title>
+<meta name="description" content="Dušan Milosavljević — English coach, strength &amp; conditioning trainer, and indie AI builder in Da Nang, Vietnam. Lean thinking, language precision, and real AI software, shipped fast." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Geist:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: #1a1814; color: #f6f4ef; }
+
+  @keyframes orbDrift0 {
+    0%   { transform: translate(0,    0   ) scale(1);    }
+    40%  { transform: translate(6%,  -9%  ) scale(1.07); }
+    100% { transform: translate(11%, -4%  ) scale(0.95); }
+  }
+  @keyframes orbDrift1 {
+    0%   { transform: translate(0,    0   ) scale(1);    }
+    35%  { transform: translate(-8%,  3%  ) scale(0.94); }
+    100% { transform: translate(-5%,  10% ) scale(1.06); }
+  }
+  @keyframes orbDrift2 {
+    0%   { transform: translate(0,    0   ) scale(1);    }
+    55%  { transform: translate(9%,   6%  ) scale(1.08); }
+    100% { transform: translate(4%,   10% ) scale(0.96); }
+  }
+  @keyframes orbDrift3 {
+    0%   { transform: translate(0,    0   ) scale(1);    }
+    45%  { transform: translate(-6%, -8%  ) scale(0.93); }
+    100% { transform: translate(-10%,-4%  ) scale(1.05); }
+  }
+  @keyframes ringSpin       { to { transform: rotate(360deg); } }
+  @keyframes ringSpinReverse{ to { transform: rotate(-360deg); } }
+  @keyframes marquee        { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes fadeUp         { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulseDot       { 0%,100% { opacity: .25; } 50% { opacity: 1; } }
+  @keyframes blink          { 50% { opacity: 0; } }
+
+  .pulse-dot {
+    width: 6px; height: 6px; border-radius: 999px; background: currentColor;
+    animation: pulseDot 1s ease-in-out infinite; display: inline-block;
+  }
+  .dots::after { content: "···"; animation: blink 1.2s infinite; margin-left: 2px; letter-spacing: 0.2em; }
+
+  html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+
+// tweaks-panel.jsx
+// Reusable Tweaks shell + form-control helpers.
+//
+// Owns the host protocol (listens for __activate_edit_mode / __deactivate_edit_mode,
+// posts __edit_mode_available / __edit_mode_set_keys / __edit_mode_dismissed) so
+// individual prototypes don't re-roll it. Ships a consistent set of controls so you
+// don't hand-draw <input type="range">, segmented radios, steppers, etc.
+//
+// Usage (in an HTML file that loads React + Babel):
+//
+//   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+//     "primaryColor": "#D97757",
+//     "palette": ["#D97757", "#29261b", "#f6f4ef"],
+//     "fontSize": 16,
+//     "density": "regular",
+//     "dark": false
+//   }/*EDITMODE-END*/;
+//
+//   function App() {
+//     const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+//     return (
+//       <div style={{ fontSize: t.fontSize, color: t.primaryColor }}>
+//         Hello
+//         <TweaksPanel>
+//           <TweakSection label="Typography" />
+//           <TweakSlider label="Font size" value={t.fontSize} min={10} max={32} unit="px"
+//                        onChange={(v) => setTweak('fontSize', v)} />
+//           <TweakRadio  label="Density" value={t.density}
+//                        options={['compact', 'regular', 'comfy']}
+//                        onChange={(v) => setTweak('density', v)} />
+//           <TweakSection label="Theme" />
+//           <TweakColor  label="Primary" value={t.primaryColor}
+//                        options={['#D97757', '#2A6FDB', '#1F8A5B', '#7A5AE0']}
+//                        onChange={(v) => setTweak('primaryColor', v)} />
+//           <TweakColor  label="Palette" value={t.palette}
+//                        options={[['#D97757', '#29261b', '#f6f4ef'],
+//                                  ['#475569', '#0f172a', '#f1f5f9']]}
+//                        onChange={(v) => setTweak('palette', v)} />
+//           <TweakToggle label="Dark mode" value={t.dark}
+//                        onChange={(v) => setTweak('dark', v)} />
+//         </TweaksPanel>
+//       </div>
+//     );
+//   }
+//
+// ─────────────────────────────────────────────────────────────────────────────
+
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
+    max-height:calc(100vh - 32px);display:flex;flex-direction:column;
+    transform:scale(var(--dc-inv-zoom,1));transform-origin:bottom right;
+    background:rgba(250,249,247,.78);color:#29261b;
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    border:.5px solid rgba(255,255,255,.6);border-radius:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);
+    font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);
+    width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;
+    overflow-y:auto;overflow-x:hidden;min-height:0;
+    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}
+  .twk-body::-webkit-scrollbar{width:8px}
+  .twk-body::-webkit-scrollbar-track{background:transparent;margin:2px}
+  .twk-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px;
+    border:2px solid transparent;background-clip:content-box}
+  .twk-body::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25);
+    border:2px solid transparent;background-clip:content-box}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;
+    color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}
+
+  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-sect:first-child{padding-top:0}
+
+  .twk-field{appearance:none;box-sizing:border-box;width:100%;min-width:0;height:26px;padding:0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;
+    background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
+  .twk-field:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.85)}
+  select.twk-field{padding-right:22px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(0,0,0,.5)' d='M0 0h10L5 6z'/></svg>");
+    background-repeat:no-repeat;background-position:right 8px center}
+
+  .twk-slider{appearance:none;-webkit-appearance:none;width:100%;height:4px;margin:6px 0;
+    border-radius:999px;background:rgba(0,0,0,.12);outline:none}
+  .twk-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;background:#fff;
+    border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+  .twk-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+    background:#fff;border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;
+    background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;
+    background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);
+    transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}
+  .twk-seg.dragging .twk-seg-thumb{transition:none}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;
+    background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;
+    border-radius:6px;cursor:default;padding:4px 6px;line-height:1.2;
+    overflow-wrap:anywhere}
+
+  .twk-toggle{position:relative;width:32px;height:18px;border:0;border-radius:999px;
+    background:rgba(0,0,0,.15);transition:background .15s;cursor:default;padding:0}
+  .twk-toggle[data-on="1"]{background:#34c759}
+  .twk-toggle i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+  .twk-toggle[data-on="1"] i{transform:translateX(14px)}
+
+  .twk-num{display:flex;align-items:center;box-sizing:border-box;min-width:0;height:26px;padding:0 0 0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;background:rgba(255,255,255,.6)}
+  .twk-num-lbl{font-weight:500;color:rgba(41,38,27,.6);cursor:ew-resize;
+    user-select:none;padding-right:8px}
+  .twk-num input{flex:1;min-width:0;height:100%;border:0;background:transparent;
+    font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:0 8px 0 0;
+    outline:none;color:inherit;-moz-appearance:textfield}
+  .twk-num input::-webkit-inner-spin-button,.twk-num input::-webkit-outer-spin-button{
+    -webkit-appearance:none;margin:0}
+  .twk-num-unit{padding-right:8px;color:rgba(41,38,27,.45)}
+
+  .twk-btn{appearance:none;height:26px;padding:0 12px;border:0;border-radius:7px;
+    background:rgba(0,0,0,.78);color:#fff;font:inherit;font-weight:500;cursor:default}
+  .twk-btn:hover{background:rgba(0,0,0,.88)}
+  .twk-btn.secondary{background:rgba(0,0,0,.06);color:inherit}
+  .twk-btn.secondary:hover{background:rgba(0,0,0,.1)}
+
+  .twk-swatch{appearance:none;-webkit-appearance:none;width:56px;height:22px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:6px;padding:0;cursor:default;
+    background:transparent;flex-shrink:0}
+  .twk-swatch::-webkit-color-swatch-wrapper{padding:0}
+  .twk-swatch::-webkit-color-swatch{border:0;border-radius:5.5px}
+  .twk-swatch::-moz-color-swatch{border:0;border-radius:5.5px}
+
+  .twk-chips{display:flex;gap:6px}
+  .twk-chip{position:relative;appearance:none;flex:1;min-width:0;height:46px;
+    padding:0;border:0;border-radius:6px;overflow:hidden;cursor:default;
+    box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.06);
+    transition:transform .12s cubic-bezier(.3,.7,.4,1),box-shadow .12s}
+  .twk-chip:hover{transform:translateY(-1px);
+    box-shadow:0 0 0 .5px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.12)}
+  .twk-chip[data-on="1"]{box-shadow:0 0 0 1.5px rgba(0,0,0,.85),
+    0 2px 6px rgba(0,0,0,.15)}
+  .twk-chip>span{position:absolute;top:0;bottom:0;right:0;width:34%;
+    display:flex;flex-direction:column;box-shadow:-1px 0 0 rgba(0,0,0,.1)}
+  .twk-chip>span>i{flex:1;box-shadow:0 -1px 0 rgba(0,0,0,.1)}
+  .twk-chip>span>i:first-child{box-shadow:none}
+  .twk-chip svg{position:absolute;top:6px;left:6px;width:13px;height:13px;
+    filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+`;
+
+// ── useTweaks ───────────────────────────────────────────────────────────────
+// Single source of truth for tweak values. setTweak persists via the host
+// (__edit_mode_set_keys → host rewrites the EDITMODE block on disk).
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  // Accepts either setTweak('key', value) or setTweak({ key: value, ... }) so a
+  // useState-style call doesn't write a "[object Object]" key into the persisted
+  // JSON block.
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null
+      ? keyOrEdits : { [keyOrEdits]: val };
+    setValues((prev) => ({ ...prev, ...edits }));
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
+    // Same-window signal so in-page listeners (deck-stage rail thumbnails)
+    // can react — the parent message only reaches the host, not peers.
+    window.dispatchEvent(new CustomEvent('tweakchange', { detail: edits }));
+  }, []);
+  return [values, setTweak];
+}
+
+// ── TweaksPanel ─────────────────────────────────────────────────────────────
+// Floating shell. Registers the protocol listener BEFORE announcing
+// availability — if the announce ran first, the host's activate could land
+// before our handler exists and the toolbar toggle would silently no-op.
+// The close button posts __edit_mode_dismissed so the host's toolbar toggle
+// flips off in lockstep; the host echoes __deactivate_edit_mode back which
+// is what actually hides the panel.
+function TweaksPanel({ title = 'Tweaks', noDeckControls = false, children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  // Auto-inject a rail toggle when a <deck-stage> is on the page. The
+  // toggle drives the deck's per-viewer _railVisible via window message;
+  // state is mirrored from the same localStorage key the deck reads so
+  // the control reflects reality across reloads. The mechanism is the
+  // message — authors who want custom placement can post it directly
+  // and pass noDeckControls to suppress this one.
+  const hasDeckStage = React.useMemo(
+    () => typeof document !== 'undefined' && !!document.querySelector('deck-stage'),
+    [],
+  );
+  // deck-stage enables its rail in connectedCallback, but this panel can
+  // mount before that element has upgraded. The initial read catches the
+  // common case; the listener covers mounting first. (Older deck-stage.js
+  // copies still wait for the host's __omelette_rail_enabled postMessage —
+  // same listener handles those.)
+  const [railEnabled, setRailEnabled] = React.useState(
+    () => hasDeckStage && !!document.querySelector('deck-stage')?._railEnabled,
+  );
+  React.useEffect(() => {
+    if (!hasDeckStage || railEnabled) return undefined;
+    const onMsg = (e) => {
+      if (e.data && e.data.type === '__omelette_rail_enabled') setRailEnabled(true);
+    };
+    window.addEventListener('message', onMsg);
+    return () => window.removeEventListener('message', onMsg);
+  }, [hasDeckStage, railEnabled]);
+  const [railVisible, setRailVisible] = React.useState(() => {
+    try { return localStorage.getItem('deck-stage.railVisible') !== '0'; } catch (e) { return true; }
+  });
+  const toggleRail = (on) => {
+    setRailVisible(on);
+    window.postMessage({ type: '__deck_rail_visible', on }, '*');
+  };
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+  const PAD = 16;
+
+  const clampToViewport = React.useCallback(() => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    const maxRight = Math.max(PAD, window.innerWidth - w - PAD);
+    const maxBottom = Math.max(PAD, window.innerHeight - h - PAD);
+    offsetRef.current = {
+      x: Math.min(maxRight, Math.max(PAD, offsetRef.current.x)),
+      y: Math.min(maxBottom, Math.max(PAD, offsetRef.current.y)),
+    };
+    panel.style.right = offsetRef.current.x + 'px';
+    panel.style.bottom = offsetRef.current.y + 'px';
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    clampToViewport();
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', clampToViewport);
+      return () => window.removeEventListener('resize', clampToViewport);
+    }
+    const ro = new ResizeObserver(clampToViewport);
+    ro.observe(document.documentElement);
+    return () => ro.disconnect();
+  }, [open, clampToViewport]);
+
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      const t = e?.data?.type;
+      if (t === '__activate_edit_mode') setOpen(true);
+      else if (t === '__deactivate_edit_mode') setOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const dismiss = () => {
+    setOpen(false);
+    window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*');
+  };
+
+  const onDragStart = (e) => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const startRight = window.innerWidth - r.right;
+    const startBottom = window.innerHeight - r.bottom;
+    const move = (ev) => {
+      offsetRef.current = {
+        x: startRight - (ev.clientX - sx),
+        y: startBottom - (ev.clientY - sy),
+      };
+      clampToViewport();
+    };
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  };
+
+  if (!open) return null;
+  return (
+    <>
+      <style>{__TWEAKS_STYLE}</style>
+      <div ref={dragRef} className="twk-panel" data-noncommentable=""
+           style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
+        <div className="twk-hd" onMouseDown={onDragStart}>
+          <b>{title}</b>
+          <button className="twk-x" aria-label="Close tweaks"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={dismiss}>✕</button>
+        </div>
+        <div className="twk-body">
+          {children}
+          {hasDeckStage && railEnabled && !noDeckControls && (
+            <TweakSection label="Deck">
+              <TweakToggle label="Thumbnail rail" value={railVisible} onChange={toggleRail} />
+            </TweakSection>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ── Layout helpers ──────────────────────────────────────────────────────────
+
+function TweakSection({ label, children }) {
+  return (
+    <>
+      <div className="twk-sect">{label}</div>
+      {children}
+    </>
+  );
+}
+
+function TweakRow({ label, value, children, inline = false }) {
+  return (
+    <div className={inline ? 'twk-row twk-row-h' : 'twk-row'}>
+      <div className="twk-lbl">
+        <span>{label}</span>
+        {value != null && <span className="twk-val">{value}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// ── Controls ────────────────────────────────────────────────────────────────
+
+function TweakSlider({ label, value, min = 0, max = 100, step = 1, unit = '', onChange }) {
+  return (
+    <TweakRow label={label} value={`${value}${unit}`}>
+      <input type="range" className="twk-slider" min={min} max={max} step={step}
+             value={value} onChange={(e) => onChange(Number(e.target.value))} />
+    </TweakRow>
+  );
+}
+
+function TweakToggle({ label, value, onChange }) {
+  return (
+    <div className="twk-row twk-row-h">
+      <div className="twk-lbl"><span>{label}</span></div>
+      <button type="button" className="twk-toggle" data-on={value ? '1' : '0'}
+              role="switch" aria-checked={!!value}
+              onClick={() => onChange(!value)}><i /></button>
+    </div>
+  );
+}
+
+function TweakRadio({ label, value, options, onChange }) {
+  const trackRef = React.useRef(null);
+  const [dragging, setDragging] = React.useState(false);
+  // The active value is read by pointer-move handlers attached for the lifetime
+  // of a drag — ref it so a stale closure doesn't fire onChange for every move.
+  const valueRef = React.useRef(value);
+  valueRef.current = value;
+
+  // Segments wrap mid-word once per-segment width runs out. The track is
+  // ~248px (280 panel − 28 body pad − 4 seg pad), each button loses 12px
+  // to its own padding, and 11.5px system-ui averages ~6.3px/char — so 2
+  // options fit ~16 chars each, 3 fit ~10. Past that (or >3 options), fall
+  // back to a dropdown rather than wrap.
+  const labelLen = (o) => String(typeof o === 'object' ? o.label : o).length;
+  const maxLen = options.reduce((m, o) => Math.max(m, labelLen(o)), 0);
+  const fitsAsSegments = maxLen <= ({ 2: 16, 3: 10 }[options.length] ?? 0);
+  if (!fitsAsSegments) {
+    // <select> emits strings — map back to the original option value so the
+    // fallback stays type-preserving (numbers, booleans) like the segment path.
+    const resolve = (s) => {
+      const m = options.find((o) => String(typeof o === 'object' ? o.value : o) === s);
+      return m === undefined ? s : typeof m === 'object' ? m.value : m;
+    };
+    return <TweakSelect label={label} value={value} options={options}
+                        onChange={(s) => onChange(resolve(s))} />;
+  }
+  const opts = options.map((o) => (typeof o === 'object' ? o : { value: o, label: o }));
+  const idx = Math.max(0, opts.findIndex((o) => o.value === value));
+  const n = opts.length;
+
+  const segAt = (clientX) => {
+    const r = trackRef.current.getBoundingClientRect();
+    const inner = r.width - 4;
+    const i = Math.floor(((clientX - r.left - 2) / inner) * n);
+    return opts[Math.max(0, Math.min(n - 1, i))].value;
+  };
+
+  const onPointerDown = (e) => {
+    setDragging(true);
+    const v0 = segAt(e.clientX);
+    if (v0 !== valueRef.current) onChange(v0);
+    const move = (ev) => {
+      if (!trackRef.current) return;
+      const v = segAt(ev.clientX);
+      if (v !== valueRef.current) onChange(v);
+    };
+    const up = () => {
+      setDragging(false);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+
+  return (
+    <TweakRow label={label}>
+      <div ref={trackRef} role="radiogroup" onPointerDown={onPointerDown}
+           className={dragging ? 'twk-seg dragging' : 'twk-seg'}>
+        <div className="twk-seg-thumb"
+             style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`,
+                      width: `calc((100% - 4px) / ${n})` }} />
+        {opts.map((o) => (
+          <button key={o.value} type="button" role="radio" aria-checked={o.value === value}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </TweakRow>
+  );
+}
+
+function TweakSelect({ label, value, options, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <select className="twk-field" value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((o) => {
+          const v = typeof o === 'object' ? o.value : o;
+          const l = typeof o === 'object' ? o.label : o;
+          return <option key={v} value={v}>{l}</option>;
+        })}
+      </select>
+    </TweakRow>
+  );
+}
+
+function TweakText({ label, value, placeholder, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <input className="twk-field" type="text" value={value} placeholder={placeholder}
+             onChange={(e) => onChange(e.target.value)} />
+    </TweakRow>
+  );
+}
+
+function TweakNumber({ label, value, min, max, step = 1, unit = '', onChange }) {
+  const clamp = (n) => {
+    if (min != null && n < min) return min;
+    if (max != null && n > max) return max;
+    return n;
+  };
+  const startRef = React.useRef({ x: 0, val: 0 });
+  const onScrubStart = (e) => {
+    e.preventDefault();
+    startRef.current = { x: e.clientX, val: value };
+    const decimals = (String(step).split('.')[1] || '').length;
+    const move = (ev) => {
+      const dx = ev.clientX - startRef.current.x;
+      const raw = startRef.current.val + dx * step;
+      const snapped = Math.round(raw / step) * step;
+      onChange(clamp(Number(snapped.toFixed(decimals))));
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+  return (
+    <div className="twk-num">
+      <span className="twk-num-lbl" onPointerDown={onScrubStart}>{label}</span>
+      <input type="number" value={value} min={min} max={max} step={step}
+             onChange={(e) => onChange(clamp(Number(e.target.value)))} />
+      {unit && <span className="twk-num-unit">{unit}</span>}
+    </div>
+  );
+}
+
+// Relative-luminance contrast pick — checkmarks drawn over a swatch need to
+// read on both #111 and #fafafa without per-option configuration. Hex input
+// only (#rgb / #rrggbb); named or rgb()/hsl() colors fall through to "light".
+function __twkIsLight(hex) {
+  const h = String(hex).replace('#', '');
+  const x = h.length === 3 ? h.replace(/./g, (c) => c + c) : h.padEnd(6, '0');
+  const n = parseInt(x.slice(0, 6), 16);
+  if (Number.isNaN(n)) return true;
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  return r * 299 + g * 587 + b * 114 > 148000;
+}
+
+const __TwkCheck = ({ light }) => (
+  <svg viewBox="0 0 14 14" aria-hidden="true">
+    <path d="M3 7.2 5.8 10 11 4.2" fill="none" strokeWidth="2.2"
+          strokeLinecap="round" strokeLinejoin="round"
+          stroke={light ? 'rgba(0,0,0,.78)' : '#fff'} />
+  </svg>
+);
+
+// TweakColor — curated color/palette picker. Each option is either a single
+// hex string or an array of 1-5 hex strings; the card adapts — a lone color
+// renders solid, a palette renders colors[0] as the hero (left ~2/3) with the
+// rest stacked in a sharp column on the right. onChange emits the
+// option in the shape it was passed (string stays string, array stays array).
+// Without options it falls back to the native color input for back-compat.
+function TweakColor({ label, value, options, onChange }) {
+  if (!options || !options.length) {
+    return (
+      <div className="twk-row twk-row-h">
+        <div className="twk-lbl"><span>{label}</span></div>
+        <input type="color" className="twk-swatch" value={value}
+               onChange={(e) => onChange(e.target.value)} />
+      </div>
+    );
+  }
+  // Native <input type=color> emits lowercase hex per the HTML spec, so
+  // compare case-insensitively. String() guards JSON.stringify(undefined),
+  // which returns the primitive undefined (no .toLowerCase).
+  const key = (o) => String(JSON.stringify(o)).toLowerCase();
+  const cur = key(value);
+  return (
+    <TweakRow label={label}>
+      <div className="twk-chips" role="radiogroup">
+        {options.map((o, i) => {
+          const colors = Array.isArray(o) ? o : [o];
+          const [hero, ...rest] = colors;
+          const sup = rest.slice(0, 4);
+          const on = key(o) === cur;
+          return (
+            <button key={i} type="button" className="twk-chip" role="radio"
+                    aria-checked={on} data-on={on ? '1' : '0'}
+                    aria-label={colors.join(', ')} title={colors.join(' · ')}
+                    style={{ background: hero }}
+                    onClick={() => onChange(o)}>
+              {sup.length > 0 && (
+                <span>
+                  {sup.map((c, j) => <i key={j} style={{ background: c }} />)}
+                </span>
+              )}
+              {on && <__TwkCheck light={__twkIsLight(hero)} />}
+            </button>
+          );
+        })}
+      </div>
+    </TweakRow>
+  );
+}
+
+function TweakButton({ label, onClick, secondary = false }) {
+  return (
+    <button type="button" className={secondary ? 'twk-btn secondary' : 'twk-btn'}
+            onClick={onClick}>{label}</button>
+  );
+}
+
+Object.assign(window, {
+  useTweaks, TweaksPanel, TweakSection, TweakRow,
+  TweakSlider, TweakToggle, TweakRadio, TweakSelect,
+  TweakText, TweakNumber, TweakColor, TweakButton,
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+// site.jsx — Lean Progress IQ
+const { useState, useEffect, useRef, useMemo } = React;
+
+// ─── Tokens ──────────────────────────────────────────────────────────────────
+const PALETTES = {
+  cream:  { bg: "#f6f4ef", panel: "#ecead9", fg: "#1a1814", muted: "#6b655a", line: "#dcd6c4", accent: "#c66a3f", accent2: "#3b6b5a", chip: "#1a1814", chipFg: "#f6f4ef" },
+  slate:  { bg: "#f4f5f7", panel: "#e6e8ec", fg: "#0f1419", muted: "#646a78", line: "#d4d8df", accent: "#4a6cf7", accent2: "#9a4afc", chip: "#0f1419", chipFg: "#f4f5f7" },
+  ink:    { bg: "#14130f", panel: "#1d1c17", fg: "#f0ede5", muted: "#9a9486", line: "#2a2820", accent: "#d4a574", accent2: "#7ab19c", chip: "#f0ede5", chipFg: "#14130f" },
+  paper:  { bg: "#ecebe5", panel: "#dad8cd", fg: "#222019", muted: "#6e6a5d", line: "#cac6b3", accent: "#a83a2c", accent2: "#445a3e", chip: "#222019", chipFg: "#ecebe5" },
+};
+
+const SERIFS = {
+  instrument: '"Instrument Serif", "Cormorant Garamond", Georgia, serif',
+  eb:         '"EB Garamond", "Cormorant Garamond", Georgia, serif',
+  playfair:   '"Playfair Display", "Cormorant Garamond", Georgia, serif',
+};
+
+// ─── Orbital SVG ─────────────────────────────────────────────────────────────
+function Orbital({ palette, density = 1, treatment = "spheres" }) {
+  const seed = useRef(Math.random() * 1000).current;
+  if (treatment === "grid") return <OrbGrid palette={palette} />;
+  if (treatment === "noise") return <OrbNoise palette={palette} />;
+  if (treatment === "rings") return <OrbRings palette={palette} />;
+
+  const count = Math.round(7 * density);
+  const spheres = useMemo(() => {
+    const rng = mulberry32(Math.floor(seed));
+    return Array.from({ length: count }, (_, i) => ({
+      cx: 15 + rng() * 70,
+      cy: 20 + rng() * 60,
+      r: 4 + rng() * 14,
+      hue: i % 3,
+      delay: rng() * 8,
+      dur: 9 + rng() * 7,
+    }));
+  }, [count, seed]);
+
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" style={{ width: "100%", height: "100%", display: "block" }}>
+      <defs>
+        {[palette.accent, palette.accent2, palette.fg].map((c, i) => (
+          <radialGradient key={i} id={`sph-${i}`} cx="35%" cy="30%" r="80%">
+            <stop offset="0%" stopColor={c} stopOpacity="0.78" />
+            <stop offset="65%" stopColor={c} stopOpacity="0.32" />
+            <stop offset="100%" stopColor={c} stopOpacity="0.04" />
+          </radialGradient>
+        ))}
+      </defs>
+      {spheres.map((s, i) => (
+        <circle key={i} cx={s.cx} cy={s.cy} r={s.r} fill={`url(#sph-${s.hue})`} style={{
+          mixBlendMode: palette.bg === PALETTES.ink.bg ? "screen" : "multiply",
+          animation: `orbDrift${i % 4} ${s.dur}s ease-in-out ${s.delay}s infinite alternate`,
+        }} />
+      ))}
+    </svg>
+  );
+}
+
+function OrbGrid({ palette }) {
+  const lines = [];
+  for (let i = 1; i < 16; i++) lines.push({ x: i * 6.25, y: i * 6.25 });
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" style={{ width: "100%", height: "100%" }}>
+      {lines.map((l, i) => (
+        <g key={i} stroke={palette.line} strokeWidth="0.08" opacity={0.7}>
+          <line x1={l.x} y1="0" x2={l.x} y2="100" />
+          <line x1="0" y1={l.y} x2="100" y2={l.y} />
+        </g>
+      ))}
+      <circle cx="38" cy="42" r="22" fill="none" stroke={palette.accent} strokeWidth="0.18" />
+      <circle cx="62" cy="58" r="14" fill={palette.accent} opacity="0.18" />
+      <circle cx="38" cy="42" r="2" fill={palette.fg} />
+      <circle cx="62" cy="58" r="1.4" fill={palette.accent} />
+    </svg>
+  );
+}
+
+function OrbRings({ palette }) {
+  return (
+    <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" style={{ width: "100%", height: "100%" }}>
+      <g style={{ transformOrigin: "50% 50%", animation: "ringSpin 60s linear infinite" }}>
+        {[36, 28, 20, 12].map((r, i) => (
+          <ellipse key={i} cx="50" cy="50" rx={r} ry={r * 0.42} fill="none"
+            stroke={i === 0 ? palette.accent : palette.muted}
+            strokeWidth={i === 0 ? 0.25 : 0.12} opacity={0.5 + i * 0.12}
+            transform={`rotate(${i * 22} 50 50)`} />
+        ))}
+      </g>
+      <circle cx="50" cy="50" r="3" fill={palette.fg} />
+      <circle cx="78" cy="50" r="1.6" fill={palette.accent} />
+      <circle cx="22" cy="50" r="1.2" fill={palette.accent2} />
+    </svg>
+  );
+}
+
+function OrbNoise({ palette }) {
+  return <div style={{ position: "absolute", inset: 0, background: `repeating-linear-gradient(45deg, ${palette.line} 0 1px, transparent 1px 14px)`, opacity: 0.6 }} />;
+}
+
+function mulberry32(a) {
+  return function() {
+    let t = (a += 0x6D2B79F5);
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// ─── Reveal on scroll ────────────────────────────────────────────────────────
+function Reveal({ children, delay = 0, as: As = "div", ...rest }) {
+  const ref = useRef(null);
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    if (!ref.current) return;
+    const checkNow = () => {
+      if (!ref.current) return false;
+      const r = ref.current.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      if (r.top < vh * 0.95 && r.bottom > 0) { setShown(true); return true; }
+      return false;
+    };
+    if (checkNow()) return;
+    let io;
+    try {
+      io = new IntersectionObserver(([e]) => {
+        if (e.isIntersecting) { setShown(true); io && io.disconnect(); }
+      }, { rootMargin: "0px 0px -8% 0px", threshold: 0 });
+      io.observe(ref.current);
+    } catch (_) {}
+    const onScroll = () => { if (checkNow()) window.removeEventListener("scroll", onScroll); };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    const t = setTimeout(() => setShown(true), 400);
+    return () => { io && io.disconnect(); window.removeEventListener("scroll", onScroll); clearTimeout(t); };
+  }, []);
+  return (
+    <As ref={ref} {...rest} style={{
+      ...rest.style,
+      opacity: shown ? 1 : 0,
+      transform: shown ? "translateY(0)" : "translateY(18px)",
+      transition: `opacity .9s cubic-bezier(.2,.7,.2,1) ${delay}s, transform .9s cubic-bezier(.2,.7,.2,1) ${delay}s`,
+    }}>{children}</As>
+  );
+}
+
+// ─── Nav ─────────────────────────────────────────────────────────────────────
+function Nav({ p, serif, dark, onDark }) {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  const links = [
+    ["What I do", "services"], ["Field Notes", "pulse"], ["How I work", "process"], ["Work", "cases"],
+  ];
+  return (
+    <nav style={{
+      position: "sticky", top: 0, zIndex: 50, padding: "18px 40px",
+      background: scrolled ? p.bg + "ee" : "transparent",
+      backdropFilter: scrolled ? "blur(14px) saturate(140%)" : "none",
+      borderBottom: scrolled ? `0.5px solid ${p.line}` : "0.5px solid transparent",
+      transition: "all .3s ease",
+    }}>
+      <div style={{ maxWidth: 1320, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <a href="#" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none", color: p.fg }}>
+          <Logo p={p} />
+          <span style={{ fontFamily: serif, fontSize: 22, letterSpacing: "-0.01em" }}>
+            Lean Progress <em style={{ fontStyle: "italic", color: p.accent }}>IQ</em>
+          </span>
+        </a>
+        <div style={{ display: "flex", alignItems: "center", gap: 30 }}>
+          {links.map(([l, h]) => (
+            <a key={l} href={`#${h}`} style={{
+              color: p.fg, textDecoration: "none", fontSize: 14, letterSpacing: "0.01em",
+              opacity: 0.78, transition: "opacity .2s",
+            }} onMouseEnter={e => e.target.style.opacity = 1} onMouseLeave={e => e.target.style.opacity = 0.78}>{l}</a>
+          ))}
+          <button onClick={onDark} aria-label="Toggle dark mode" style={{
+            width: 34, height: 34, borderRadius: 999,
+            background: "transparent", border: `0.5px solid ${p.line}`, color: p.fg,
+            cursor: "pointer", fontSize: 14, display: "inline-flex", alignItems: "center", justifyContent: "center",
+            transition: "background .2s",
+          }} onMouseEnter={e => e.currentTarget.style.background = p.panel} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+            {dark ? "☀" : "☾"}
+          </button>
+          <a href="#contact" style={{
+            padding: "10px 18px", borderRadius: 999,
+            background: p.chip, color: p.chipFg, fontSize: 13.5, fontWeight: 500,
+            textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 8,
+            transition: "transform .2s",
+          }} onMouseEnter={e => e.currentTarget.style.transform = "translateY(-1px)"} onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
+            Let's talk <span style={{ fontFamily: serif, fontStyle: "italic" }}>→</span>
+          </a>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+function Logo({ p, size = 32 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="19" stroke={p.fg} strokeWidth="0.8" />
+      <path d="M 8 26 Q 14 8, 20 20 T 32 14" stroke={p.accent} strokeWidth="1.6" fill="none" strokeLinecap="round" />
+      <circle cx="8" cy="26" r="1.8" fill={p.fg} />
+      <circle cx="32" cy="14" r="1.8" fill={p.accent} />
+    </svg>
+  );
+}
+
+// ─── Hero ────────────────────────────────────────────────────────────────────
+function Hero({ p, serif, treatment, density }) {
+  return (
+    <section style={{ position: "relative", overflow: "hidden" }}>
+      <div style={{ position: "absolute", inset: 0, opacity: 0.55 }}>
+        <Orbital palette={p} treatment={treatment} density={density} />
+      </div>
+      {/* Soft fade behind headline so text stays readable */}
+      <div style={{
+        position: "absolute", inset: 0, pointerEvents: "none",
+        background: `radial-gradient(ellipse 60% 70% at 18% 50%, ${p.bg} 0%, ${p.bg}cc 30%, transparent 70%)`,
+      }} />
+      <div style={{ position: "relative", maxWidth: 1320, margin: "0 auto", padding: "100px 40px 120px", display: "grid", gridTemplateColumns: "1.05fr 0.95fr", gap: 80, alignItems: "center" }}>
+        <Reveal>
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 14px 6px 10px",
+            background: p.bg, border: `0.5px solid ${p.line}`, borderRadius: 999,
+            fontSize: 12, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.04em",
+            color: p.fg, marginBottom: 36,
+          }}>
+            <span style={{ width: 6, height: 6, borderRadius: 999, background: p.accent, boxShadow: `0 0 0 4px ${p.accent}22` }} />
+            Da Nang, Vietnam · open for select work
+          </div>
+          <h1 style={{
+            fontFamily: serif, fontWeight: 400, lineHeight: 0.98,
+            fontSize: "clamp(56px, 6.4vw, 104px)", letterSpacing: "-0.025em",
+            margin: "0 0 32px", color: p.fg, textWrap: "balance",
+          }}>
+            Language, lean,<br />
+            and <em style={{ fontStyle: "italic", color: p.accent }}>code.</em>
+          </h1>
+          <p style={{
+            fontSize: 18, lineHeight: 1.55, maxWidth: 520, color: p.muted, margin: "0 0 40px",
+            textWrap: "pretty",
+          }}>
+            I'm Dušan — an English coach, strength trainer, and indie AI builder
+            working out of Da Nang. I take tangled things — a lesson, a process, a
+            half-formed product — and make them flow. Most of what I ship is built
+            lean and powered by AI.
+          </p>
+          <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+            <a href="#cases" style={{
+              padding: "16px 26px", borderRadius: 999,
+              background: p.chip, color: p.chipFg, fontSize: 15, fontWeight: 500,
+              textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 10,
+              transition: "transform .2s, box-shadow .2s",
+            }} onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 10px 30px rgba(0,0,0,.12)"; }}
+               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "none"; }}>
+              See the work <span style={{ fontFamily: serif, fontStyle: "italic" }}>→</span>
+            </a>
+            <a href="#contact" style={{
+              color: p.fg, fontSize: 15, textDecoration: "none",
+              borderBottom: `1px solid ${p.line}`, paddingBottom: 4,
+            }}>Start a conversation</a>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, auto)", gap: 48, marginTop: 64 }}>
+            {[["10+", "Apps & tools shipped"], ["4", "Languages I work in"], ["15 yrs", "Coaching & teaching"]].map(([v, l]) => (
+              <div key={l}>
+                <div style={{ fontFamily: serif, fontSize: 48, lineHeight: 1, color: p.fg, letterSpacing: "-0.02em" }}>{v}</div>
+                <div style={{ fontSize: 11.5, color: p.muted, marginTop: 8, fontFamily: "JetBrains Mono, monospace", textTransform: "uppercase", letterSpacing: "0.07em" }}>{l}</div>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+        <Reveal delay={0.15}>
+          <HeroDial p={p} serif={serif} />
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function HeroDial({ p, serif }) {
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => (t + 1) % 100), 50);
+    return () => clearInterval(id);
+  }, []);
+  const pct = 62 + Math.sin(tick / 16) * 4;
+  return (
+    <div style={{
+      background: p.bg, border: `0.5px solid ${p.line}`, borderRadius: 24,
+      padding: 32, position: "relative", boxShadow: "0 30px 80px -40px rgba(0,0,0,.18)",
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 28 }}>
+        <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: p.muted }}>
+          live · agentmesh
+        </span>
+        <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: p.muted }}>
+          MAY·26
+        </span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 24, alignItems: "center" }}>
+        <DialRing p={p} pct={pct} />
+        <div>
+          <div style={{ fontFamily: serif, fontSize: 56, lineHeight: 1, letterSpacing: "-0.02em", color: p.fg }}>
+            {pct.toFixed(1)}<span style={{ fontSize: 24, color: p.muted }}>%</span>
+          </div>
+          <div style={{ fontSize: 13, color: p.muted, marginTop: 6 }}>Tasks closed autonomously by sub-agents</div>
+        </div>
+      </div>
+      <div style={{ marginTop: 28, paddingTop: 20, borderTop: `0.5px dashed ${p.line}`, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+        {[["Agents", "5"], ["Evolutions", "4"], ["Tools", "12"]].map(([l, v]) => (
+          <div key={l}>
+            <div style={{ fontFamily: serif, fontSize: 22, color: p.fg, lineHeight: 1 }}>{v}</div>
+            <div style={{ fontSize: 11, color: p.muted, marginTop: 6, fontFamily: "JetBrains Mono, monospace", textTransform: "uppercase", letterSpacing: "0.06em" }}>{l}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ position: "absolute", top: -10, right: 24, padding: "4px 10px", background: p.accent, color: "#fff", borderRadius: 999, fontSize: 10.5, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.06em", textTransform: "uppercase" }}>
+        harness: agentmesh
+      </div>
+    </div>
+  );
+}
+
+function DialRing({ p, pct }) {
+  const R = 44;
+  const C = 2 * Math.PI * R;
+  const off = C * (1 - pct / 100);
+  return (
+    <svg width="120" height="120" viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r={R} fill="none" stroke={p.line} strokeWidth="3" />
+      <circle cx="50" cy="50" r={R} fill="none" stroke={p.accent} strokeWidth="3" strokeLinecap="round"
+        strokeDasharray={C} strokeDashoffset={off}
+        transform="rotate(-90 50 50)"
+        style={{ transition: "stroke-dashoffset .3s ease" }} />
+    </svg>
+  );
+}
+
+// ─── News ticker ─────────────────────────────────────────────────────────────
+function Ticker({ p, serif }) {
+  const items = [
+    "AgentMesh — a multi-agent OS harness with recursive self-learning",
+    "Hermes Workflows — drag-and-drop agents, triggered from Telegram",
+    "ClipAI Pro — AI clipboard manager, packaged for the Microsoft Store",
+    "Travel Studio IQ — an entire travel desk in one HTML file",
+    "Serbia Today — a daily news platform that publishes from a single file",
+    "Beograd 2179 — original cyberpunk fiction, built like software",
+  ];
+  return (
+    <section style={{ borderTop: `0.5px solid ${p.line}`, borderBottom: `0.5px solid ${p.line}`, padding: "20px 0", overflow: "hidden", background: p.panel }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 60, animation: "marquee 80s linear infinite", whiteSpace: "nowrap" }}>
+        {[...items, ...items].map((c, i) => (
+          <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 16, fontSize: 14, color: p.fg }}>
+            <span style={{
+              padding: "3px 9px", borderRadius: 4, background: p.accent, color: "#fff",
+              fontFamily: "JetBrains Mono, monospace", fontSize: 10, letterSpacing: "0.1em",
+            }}>BUILT</span>
+            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, letterSpacing: "0.06em", color: p.muted, textTransform: "uppercase" }}>
+              Selected work · Da Nang, VN
+            </span>
+            <span style={{ fontFamily: serif, fontSize: 18, fontStyle: "italic" }}>{c}</span>
+            <span style={{ color: p.muted }}>·</span>
+          </span>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ─── Belief / Philosophy ─────────────────────────────────────────────────────
+function Belief({ p, serif }) {
+  return (
+    <section id="about" style={{ padding: "140px 40px" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+        <Reveal>
+          <SectionLabel p={p} n="01" label="The thread" />
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h2 style={{ fontFamily: serif, fontSize: "clamp(48px, 6.4vw, 104px)", lineHeight: 0.98, letterSpacing: "-0.025em", margin: "40px 0 80px", color: p.fg, fontWeight: 400 }}>
+            Most people pick one lane. I learned the lanes are<br />
+            the <em style={{ fontStyle: "italic", color: p.accent }}>same road.</em>
+          </h2>
+        </Reveal>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 80 }}>
+          <Reveal>
+            <div style={{ position: "sticky", top: 120 }}>
+              <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: p.muted, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 16 }}>
+                // Lean Progress IQ · Da Nang, Vietnam
+              </div>
+              <Logo p={p} size={48} />
+            </div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 28, fontSize: 18, lineHeight: 1.65, color: p.fg, textWrap: "pretty" }}>
+              <p style={{ margin: 0 }}>
+                I teach English to European professionals, coach strength in a Da Nang
+                studio, and ship AI software in the hours in between. People assume
+                those are three unrelated jobs. They're three angles on one skill:
+                taking something tangled and making it move cleanly.
+              </p>
+              <p style={{ margin: 0 }}>
+                <strong style={{ fontWeight: 500 }}>Language taught me precision.</strong>{" "}
+                A C1 learner doesn't need more words — they need the right ones, in the
+                right order, under pressure. That's the same discipline a good prompt
+                needs. The same discipline a clean process needs. Say exactly what you
+                mean and nothing else.
+              </p>
+              <p style={{ margin: 0 }}>
+                <strong style={{ fontWeight: 500 }}>Lean taught me to hunt waste.</strong>{" "}
+                Years in automotive logistics — PDCA, 5S, FMEA — trained me to see the
+                wastes hiding inside any workflow: the waiting, the rework, the steps
+                nobody can justify. I don't pile on tools. I remove friction until the
+                work flows on its own.
+              </p>
+              <p style={{ margin: 0 }}>
+                <strong style={{ fontWeight: 500 }}>AI lets me ship.</strong>{" "}
+                With Cursor, Claude, and a handful of well-trained agents, an idea
+                becomes a working thing in an afternoon — not a slide about the thing,
+                the actual thing. Single-file where it can be. No over-engineering.
+              </p>
+              <p style={{ margin: 0, fontFamily: serif, fontSize: 24, lineHeight: 1.4, color: p.fg, fontStyle: "italic", paddingLeft: 24, borderLeft: `2px solid ${p.accent}` }}>
+                I don't sell a methodology. I build what's in front of me — a lesson, a
+                program, an app, an agent — and I build it lean.
+              </p>
+              <p style={{ margin: 0, color: p.muted, fontSize: 15.5 }}>
+                Based in Da Nang, Vietnam. Serbian by origin, working with people across
+                Europe, Asia, and the Americas. English, Serbian, German, a little
+                Spanish — and increasingly, Python.
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SectionLabel({ p, n, label }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 14, fontFamily: "JetBrains Mono, monospace", fontSize: 11, letterSpacing: "0.08em", textTransform: "uppercase", color: p.muted }}>
+      <span>{n}</span>
+      <span style={{ width: 28, height: 1, background: p.line }} />
+      <span>{label}</span>
+    </div>
+  );
+}
+
+// ─── Services ────────────────────────────────────────────────────────────────
+const SERVICES = [
+  {
+    tag: "Applied AI · Vibe Coding",
+    title: "Agents and apps, shipped fast.",
+    body: "From a single-file web app to a multi-agent orchestration harness — I build with Cursor, Claude, and DeepSeek, using natural language as the primary interface. Idea to deployed in days, not quarters, and lean enough that you can actually maintain it.",
+    metric: "Idea → live in days",
+  },
+  {
+    tag: "Language · B1–C2",
+    title: "English that holds up under pressure.",
+    body: "Fifteen years coaching professionals across Europe — banking, telecom, engineering — to communicate with precision in the rooms that matter. Corporate groups and one-to-one, calibrated to your real level and your actual job, not a textbook.",
+    metric: "15 yrs · B1–C2",
+  },
+  {
+    tag: "Lean · Supply Chain",
+    title: "Cut the waste, keep the flow.",
+    body: "Automotive-grade Lean — PDCA, 5S, FMEA — applied to operations that aren't factories. I find the waiting, rework, and dead steps hiding in your process and design the standard work that removes them.",
+    metric: "PDCA · 5S · FMEA",
+  },
+  {
+    tag: "Strength & Conditioning",
+    title: "Train for the long game.",
+    body: "Coaching since 2009 — programming for strength, conditioning, and durability that fits a working adult's life, not a magazine cover. Sustainable load, honest progression.",
+    metric: "Coaching since 2009",
+  },
+  {
+    tag: "Creative · Content",
+    title: "Stories, scripts, and worlds.",
+    body: "Documentary narration, original fiction, and faceless video production — Serbian history and cyberpunk futures, written across English and Serbian Cyrillic and built for the screen.",
+    metric: "EN + SR · screen-ready",
+  },
+];
+
+function Services({ p, serif }) {
+  return (
+    <section id="services" style={{ padding: "120px 40px", background: p.panel, borderTop: `0.5px solid ${p.line}`, borderBottom: `0.5px solid ${p.line}` }}>
+      <div style={{ maxWidth: 1320, margin: "0 auto" }}>
+        <Reveal>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 60, marginBottom: 80 }}>
+            <SectionLabel p={p} n="02" label="What I do" />
+            <div>
+              <h2 style={{ fontFamily: serif, fontSize: "clamp(40px, 5vw, 76px)", lineHeight: 1, letterSpacing: "-0.02em", margin: 0, color: p.fg, fontWeight: 400 }}>
+                Five disciplines, <em style={{ fontStyle: "italic", color: p.accent }}>one operator</em>.
+              </h2>
+              <p style={{ fontSize: 17, lineHeight: 1.6, color: p.muted, maxWidth: 600, marginTop: 24, textWrap: "pretty" }}>
+                They look like five different jobs. They run on the same engine —
+                clarity, less waste, fast execution. Pick the one you need; you get
+                the whole way of thinking.
+              </p>
+            </div>
+          </div>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 24 }}>
+          {SERVICES.map((s, i) => (
+            <Reveal key={i} delay={(i % 3) * 0.08} style={{ gridColumn: i < 2 ? "span 3" : "span 2" }}>
+              <ServiceCard p={p} serif={serif} s={s} i={i} />
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ServiceCard({ p, serif, s, i }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <article
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        background: p.bg, border: `0.5px solid ${p.line}`, borderRadius: 18,
+        padding: 32, height: "100%", display: "flex", flexDirection: "column",
+        transition: "transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s",
+        transform: hover ? "translateY(-4px)" : "translateY(0)",
+        boxShadow: hover ? "0 24px 50px -28px rgba(0,0,0,.25)" : "none",
+        cursor: "default",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 28 }}>
+        <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, letterSpacing: "0.07em", textTransform: "uppercase", color: p.accent }}>
+          {String(i + 1).padStart(2, "0")} · {s.tag}
+        </span>
+      </div>
+      <h3 style={{ fontFamily: serif, fontSize: 32, lineHeight: 1.05, letterSpacing: "-0.015em", color: p.fg, fontWeight: 400, margin: "0 0 16px" }}>
+        {s.title}
+      </h3>
+      <p style={{ fontSize: 14.5, lineHeight: 1.6, color: p.muted, margin: 0, textWrap: "pretty" }}>{s.body}</p>
+      <div style={{ marginTop: "auto", paddingTop: 24, borderTop: `0.5px dashed ${p.line}`, display: "flex", alignItems: "center", justifyContent: "space-between", fontFamily: "JetBrains Mono, monospace", fontSize: 11.5, color: p.fg, letterSpacing: "0.04em" }}>
+        <span>{s.metric}</span>
+        <span style={{ fontFamily: serif, fontStyle: "italic", fontSize: 18, transform: hover ? "translateX(4px)" : "none", transition: "transform .3s" }}>→</span>
+      </div>
+    </article>
+  );
+}
+
+// ─── AI Pulse (news + interactive) ───────────────────────────────────────────
+const PULSE_STORIES = [
+  {
+    tag: "★ Field Note · Agents", date: "May 2026",
+    title: "Recursive learning is the part everyone skips. It's also the part that matters.",
+    body: "Building AgentMesh taught me that the hard problem isn't getting agents to run — it's getting the harness to get better on its own.",
+    words: 540, big: true,
+    article: [
+      "Everyone can wire up an agent that calls a model and runs a tool. That part is a weekend. The interesting problem starts the second time you run the same task and the system makes the same mistake it made the first time. A harness that can't learn from its own runs isn't autonomous — it's a very expensive macro.",
+      "AgentMesh is my answer to that. One orchestrator decomposes a goal and dispatches the pieces across several Hermes sub-agents. Each run leaves behind an episode — what was attempted, what worked, what failed and why. A recursive learner reads those episodes and rewrites the harness's own strategy: which agent gets which kind of task, when to retry, when to stop. Four evolutions have been accepted so far, each one measured against the last, not vibes.",
+      "The Lean instinct shows up everywhere here. An agent that re-reads a file it already has is waiting. An agent that redoes a step because the last one failed silently is rework. Most 'agent frameworks' bury those wastes under abstraction. I'd rather see them — file-backed state, an honest trace log, a memory layer that remembers the lesson and not just the transcript.",
+      "It runs on a single machine on my Fedora box right now, DeepSeek under the hood, Redis Streams as the message bus when I want persistence. None of it is magic. It's just the same loop I trust in every other part of my work: do the thing, look at what happened, remove the friction, do it again — except now the loop partly runs itself.",
+    ],
+  },
+  {
+    tag: "Field Note · Hermes", date: "May 2026",
+    title: "Telegram is the best UI I never designed.",
+    body: "Hermes Workflows runs agents from a chat message and shows them thinking, live, on a board. The trigger was already in my pocket.",
+    article: [
+      "I built Hermes Workflows as a drag-and-drop canvas — nodes you connect into a flow that exports to runnable Python. RSS fetch, AI rewrite, HTML build, FTP deploy. Useful. But the moment it got fun was when I stopped opening the laptop to run it.",
+      "Now I send a message to a Telegram bot. The bot spawns an agent, and the workflow board lights up live over WebSocket — each node turning green or red as it executes, output previews on the edges. When it finishes, the result comes back to the same chat. The board became a control room I watch from anywhere; Telegram became the remote.",
+      "The lesson I keep relearning: don't design a new interface when the user already lives in one. The best UI is often the one already in someone's hand. I didn't need to teach myself a habit — I just hung the machinery off a habit I already had.",
+    ],
+  },
+  {
+    tag: "Field Note · Craft", date: "April 2026",
+    title: "Single-file apps are underrated.",
+    body: "Travel Studio IQ and Serbia Today are each, essentially, one file. That constraint is a feature, not a compromise.",
+    article: [
+      "Travel Studio IQ does a lot — visa and bilateral-relations lookup, baggage rules, packing checklists, a live currency converter, world clocks, document analysis. Serbia Today publishes a full news site from a swappable articles file. Neither has a backend. Each is close to a single HTML document you can open from a USB stick.",
+      "People treat 'no framework, no build step' as a limitation. I treat it as the discipline that keeps a project shippable. One file means no dependency rot, nothing to deploy, nothing to break at 2am because a package updated. It runs in 2026 and it'll run in 2031.",
+      "This is just 5S applied to code. A place for everything, everything in its place, and ruthless removal of what doesn't earn its keep. When the whole app fits in your head, you can actually finish it — and finishing is the rarest skill in this work.",
+    ],
+  },
+  {
+    tag: "Field Note · Method", date: "March 2026",
+    title: "Lean was prompt engineering before there were prompts.",
+    body: "PDCA, 5S, and FMEA map almost one-to-one onto how I work with AI. The factory floor was good training for the model.",
+    article: [
+      "I spent years in automotive logistics running PDCA loops — Plan, Do, Check, Act. It turns out that's exactly the loop a good AI workflow runs: state the goal cleanly, let the model act, check the output against reality, adjust the instruction, go again. The people who are good at prompting are usually good at this loop, whether or not they've ever heard of Deming.",
+      "FMEA — failure mode and effects analysis — is the habit of asking 'where will this break, and what happens when it does' before it breaks. That's the difference between an agent demo and an agent you'd actually leave running. I think about the failure modes first now: the empty file, the timed-out tool, the silent retry.",
+      "None of this is nostalgia for the factory. It's that the discipline transfers. Remove waste, standardize what works, expect failure and design for it. The tools changed. The thinking didn't.",
+    ],
+  },
+  {
+    tag: "Field Note · Language", date: "February 2026",
+    title: "Teaching C2 English made me better at talking to models.",
+    body: "Fifteen years of getting professionals to say exactly what they mean turns out to be the core skill of working with AI.",
+    article: [
+      "A learner at C1 doesn't have a vocabulary problem. They have a precision problem — too many words, hedged in the wrong places, the real meaning buried. My whole job is helping them cut to the sentence they actually meant. That is, almost exactly, the skill of writing a prompt that gets a clean answer the first time.",
+      "Ambiguity is expensive in both rooms. A vague instruction to a student produces a vague essay; a vague instruction to a model produces a confident wrong answer. The fix is the same: name the audience, the format, the constraint, and the one thing that matters most. Say it plainly. Stop.",
+      "So when people ask how an English teacher ended up building multi-agent systems, this is the honest answer. I didn't switch careers. I kept doing the one thing I've always done — making meaning travel cleanly from one mind to another — and one of those minds happens to be a machine now.",
+    ],
+  },
+];
+
+function Pulse({ p, serif }) {
+  const examples = [
+    "What is AgentMesh and why did you build it?",
+    "How do teaching, training, and coding fit together?",
+    "Can you build me a single-file app?",
+  ];
+  const [q, setQ] = useState("");
+  const [a, setA] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [openStory, setOpenStory] = useState(null);
+  const ask = async (text) => {
+    const prompt = (text ?? q).trim();
+    if (!prompt) return;
+    setQ(prompt); setLoading(true); setA(null);
+    try {
+      const out = await window.claude.complete({
+        messages: [{
+          role: "user",
+          content: `You are the site agent for Lean Progress IQ, the personal brand of Dušan Milosavljević — a Serbian English coach (C2), strength & conditioning trainer, and indie AI builder based in Da Nang, Vietnam (UTC+7). His method fuses Lean (PDCA, 5S, FMEA), language precision, and fast AI execution with Cursor, Claude, and DeepSeek. Real projects he has shipped: AgentMesh (a multi-agent orchestration harness with recursive self-learning, Python + DeepSeek + Redis Streams), Hermes Workflows (a drag-and-drop visual agent builder that exports to Python and runs from Telegram with a live board), ClipAI Pro (an Electron + React AI clipboard manager packaged for the Microsoft Store), Travel Studio IQ (a single-file AI travel app), Serbia Today (a daily news platform), and Beograd 2179 (original cyberpunk fiction). Answer as his helpful site agent, referring to him as Dušan or "he". 3-5 short sentences. Direct, warm, no buzzwords, no bullet points. Italicize for sparse emphasis only. The question: ${prompt}`,
+        }],
+      });
+      setA(out);
+    } catch (e) {
+      setA("(Agent is offline — try again, or email leanproiq@gmail.com.)");
+    } finally { setLoading(false); }
+  };
+
+  return (
+    <section id="pulse" style={{ padding: "140px 40px" }}>
+      <div style={{ maxWidth: 1320, margin: "0 auto" }}>
+        <Reveal>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 60, marginBottom: 64 }}>
+            <SectionLabel p={p} n="03" label="Field Notes" />
+            <div>
+              <h2 style={{ fontFamily: serif, fontSize: "clamp(40px, 5vw, 76px)", lineHeight: 1, letterSpacing: "-0.02em", margin: 0, color: p.fg, fontWeight: 400 }}>
+                Notes from the build. <em style={{ fontStyle: "italic", color: p.accent }}>What I'm learning shipping AI.</em>
+              </h2>
+              <p style={{ fontSize: 17, lineHeight: 1.6, color: p.muted, maxWidth: 620, marginTop: 24, textWrap: "pretty" }}>
+                Short, honest write-ups from my own projects — what worked, what broke,
+                and the through-line between teaching, lean, and code. Click any card to
+                read the full note.
+              </p>
+            </div>
+          </div>
+        </Reveal>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 18, marginBottom: 80 }}>
+          {PULSE_STORIES.map((s, i) => (
+            <Reveal key={i} delay={(i % 3) * 0.06} style={{ gridColumn: s.big ? "span 3" : i === 0 ? "span 3" : "span 2" }}>
+              <PulseCard p={p} serif={serif} s={s} big={s.big} onOpen={() => setOpenStory(s)} />
+            </Reveal>
+          ))}
+        </div>
+
+        {openStory && <ArticleModal p={p} serif={serif} s={openStory} onClose={() => setOpenStory(null)} />}
+
+        <Reveal>
+          <div style={{ marginBottom: 24 }}>
+            <SectionLabel p={p} n="◆" label="Ask · live agent" />
+          </div>
+        </Reveal>
+        <Reveal delay={0.05}>
+          <h3 style={{ fontFamily: serif, fontSize: "clamp(32px, 4vw, 56px)", lineHeight: 1.05, letterSpacing: "-0.02em", margin: "0 0 28px", color: p.fg, fontWeight: 400, maxWidth: 900 }}>
+            Or just ask the site agent <em style={{ fontStyle: "italic", color: p.accent }}>anything</em>.
+          </h3>
+          <p style={{ fontSize: 16, lineHeight: 1.6, color: p.muted, maxWidth: 620, textWrap: "pretty", margin: "0 0 32px" }}>
+            A small agent that knows my work, my method, and how I think. Faster than an
+            email, and a fair demo of the kind of thing I build. No address required.
+          </p>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <div style={{
+            background: p.panel, borderRadius: 20, padding: 28, border: `0.5px solid ${p.line}`,
+            display: "flex", flexDirection: "column", gap: 18,
+          }}>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              {examples.map((e, i) => (
+                <button key={i} onClick={() => ask(e)} style={{
+                  padding: "8px 14px", borderRadius: 999,
+                  background: p.bg, border: `0.5px solid ${p.line}`,
+                  fontSize: 13, color: p.fg, cursor: "pointer",
+                  fontFamily: "inherit", transition: "transform .15s",
+                }} onMouseEnter={ev => ev.target.style.transform = "translateY(-1px)"} onMouseLeave={ev => ev.target.style.transform = "translateY(0)"}>
+                  {e}
+                </button>
+              ))}
+            </div>
+            <form onSubmit={(e) => { e.preventDefault(); ask(); }} style={{
+              display: "flex", gap: 12, alignItems: "center",
+              background: p.bg, borderRadius: 14, padding: "8px 8px 8px 20px",
+              border: `0.5px solid ${p.line}`,
+            }}>
+              <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: p.accent, letterSpacing: "0.06em" }}>›</span>
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Ask about a project, the method, or what I could build for you…"
+                style={{
+                  flex: 1, padding: "12px 0", border: "none", outline: "none",
+                  background: "transparent", color: p.fg, fontSize: 15, fontFamily: "inherit",
+                }} />
+              <button type="submit" disabled={loading} style={{
+                padding: "10px 18px", borderRadius: 10,
+                background: p.chip, color: p.chipFg, border: "none",
+                fontSize: 14, fontWeight: 500, cursor: loading ? "wait" : "pointer",
+                opacity: loading ? 0.7 : 1, transition: "opacity .2s",
+                fontFamily: "inherit", display: "flex", alignItems: "center", gap: 8,
+              }}>
+                {loading ? "Thinking" : "Ask the agent"}
+                {loading && <span className="pulse-dot" />}
+              </button>
+            </form>
+            {(a || loading) && (
+              <div style={{
+                background: p.bg, borderRadius: 14, padding: "22px 24px",
+                border: `0.5px solid ${p.line}`, display: "flex", gap: 18,
+                animation: "fadeUp .4s ease",
+              }}>
+                <div style={{ flexShrink: 0 }}><Logo p={p} size={28} /></div>
+                <div>
+                  <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: p.muted, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>
+                    IQ agent · live response
+                  </div>
+                  <div style={{ fontFamily: serif, fontSize: 22, lineHeight: 1.4, color: p.fg, fontWeight: 400, whiteSpace: "pre-wrap", textWrap: "pretty" }}>
+                    {loading ? <span style={{ color: p.muted }}>composing<span className="dots" /></span> : a}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function PulseCard({ p, serif, s, big, onOpen }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <a href="#" onClick={e => { e.preventDefault(); onOpen(); }} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} style={{
+      background: big ? p.fg : p.bg, color: big ? p.bg : p.fg,
+      borderRadius: 18, padding: big ? 36 : 28, height: "100%", display: "flex", flexDirection: "column",
+      border: `0.5px solid ${p.line}`, textDecoration: "none",
+      transition: "transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s",
+      transform: hover ? "translateY(-4px)" : "none",
+      boxShadow: hover ? "0 24px 50px -30px rgba(0,0,0,.3)" : "none",
+    }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: big ? 32 : 20 }}>
+        <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, letterSpacing: "0.08em", textTransform: "uppercase", color: big ? p.accent : p.muted }}>{s.tag}</span>
+        <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: big ? p.muted : p.muted }}>{s.date}</span>
+      </div>
+      <h3 style={{ fontFamily: serif, fontSize: big ? 38 : 24, lineHeight: 1.1, letterSpacing: "-0.015em", fontWeight: 400, margin: "0 0 14px" }}>
+        {s.title}
+      </h3>
+      <p style={{ fontSize: big ? 15.5 : 13.5, lineHeight: 1.6, color: big ? p.muted : p.muted, margin: 0, textWrap: "pretty" }}>{s.body}</p>
+      <div style={{ marginTop: "auto", paddingTop: 20, display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: big ? p.bg : p.fg }}>
+        Read the full note {s.words ? `(${s.words} words)` : ""}
+        <span style={{ fontFamily: serif, fontStyle: "italic", transform: hover ? "translateX(4px)" : "none", transition: "transform .3s" }}>→</span>
+      </div>
+    </a>
+  );
+}
+
+function ArticleModal({ p, serif, s, onClose }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
+  }, [onClose]);
+
+  const wordCount = s.words || s.article.join(" ").split(/\s+/).length;
+  const readMin = Math.max(2, Math.round(wordCount / 220));
+
+  return (
+    <div onClick={onClose} style={{
+      position: "fixed", inset: 0, zIndex: 200,
+      background: "rgba(0,0,0,.5)",
+      backdropFilter: "blur(8px)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: 40, animation: "fadeUp .3s ease",
+    }}>
+      <article onClick={(e) => e.stopPropagation()} style={{
+        background: p.bg, color: p.fg, borderRadius: 24,
+        maxWidth: 880, width: "100%", maxHeight: "92vh",
+        display: "flex", flexDirection: "column",
+        border: `0.5px solid ${p.line}`,
+        boxShadow: "0 60px 120px -30px rgba(0,0,0,.5)",
+        overflow: "hidden",
+      }}>
+        {/* Sticky header */}
+        <header style={{
+          padding: "20px 32px", display: "flex", alignItems: "center", justifyContent: "space-between",
+          borderBottom: `0.5px solid ${p.line}`, flexShrink: 0,
+        }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, fontFamily: "JetBrains Mono, monospace", fontSize: 11, letterSpacing: "0.07em", textTransform: "uppercase", color: p.muted }}>
+            <Logo p={p} size={22} />
+            <span style={{ color: p.accent }}>{s.tag}</span>
+            <span>·</span>
+            <span>{s.date}</span>
+            <span>·</span>
+            <span>{readMin} min read</span>
+          </div>
+          <button onClick={onClose} aria-label="Close" style={{
+            width: 34, height: 34, borderRadius: 999, border: `0.5px solid ${p.line}`,
+            background: "transparent", color: p.fg, cursor: "pointer", fontSize: 16, lineHeight: 1,
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            transition: "background .2s",
+          }} onMouseEnter={e => e.currentTarget.style.background = p.panel} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+            ✕
+          </button>
+        </header>
+
+        {/* Scrollable body */}
+        <div style={{
+          overflowY: "auto", padding: "48px 64px 56px",
+          scrollbarWidth: "thin", scrollbarColor: `${p.line} transparent`,
+        }}>
+          <h1 style={{
+            fontFamily: serif, fontSize: "clamp(36px, 4.6vw, 60px)", lineHeight: 1.05,
+            letterSpacing: "-0.022em", fontWeight: 400, margin: "0 0 28px", color: p.fg,
+            textWrap: "balance",
+          }}>
+            {s.title.replace(/\.$/, "")}<em style={{ fontStyle: "italic", color: p.accent }}>.</em>
+          </h1>
+          <p style={{
+            fontFamily: serif, fontSize: 22, lineHeight: 1.45, color: p.muted,
+            margin: "0 0 40px", textWrap: "pretty", fontStyle: "italic",
+            paddingLeft: 20, borderLeft: `2px solid ${p.accent}`,
+          }}>
+            {s.body}
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+            {s.article.map((para, i) => (
+              <p key={i} style={{
+                margin: 0, fontSize: 17, lineHeight: 1.7, color: p.fg, textWrap: "pretty",
+              }}>
+                {i === 0 && (
+                  <span style={{
+                    fontFamily: serif, fontSize: 56, lineHeight: 0.85, float: "left",
+                    marginRight: 12, marginTop: 6, color: p.accent,
+                  }}>
+                    {para[0]}
+                  </span>
+                )}
+                {i === 0 ? para.slice(1) : para}
+              </p>
+            ))}
+          </div>
+          <div style={{
+            marginTop: 56, paddingTop: 32, borderTop: `0.5px solid ${p.line}`,
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24, flexWrap: "wrap",
+          }}>
+            <div>
+              <div style={{ fontFamily: serif, fontSize: 22, fontStyle: "italic", color: p.fg, lineHeight: 1.2 }}>
+                Want something like this built?
+              </div>
+              <div style={{ fontSize: 14, color: p.muted, marginTop: 4 }}>
+                Thirty-minute call, no slides. We'll figure out what's worth building.
+              </div>
+            </div>
+            <a href="mailto:leanproiq@gmail.com" onClick={onClose} style={{
+              padding: "14px 22px", borderRadius: 999, background: p.chip, color: p.chipFg,
+              fontSize: 14, fontWeight: 500, textDecoration: "none",
+              display: "inline-flex", alignItems: "center", gap: 10,
+            }}>
+              Book a call <span style={{ fontFamily: serif, fontStyle: "italic" }}>→</span>
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+  );
+}
+
+// ─── Process (5 phases) ──────────────────────────────────────────────────────
+const PHASES = [
+  { n: "01", t: "Listen",    d: "Understand the real problem in your words. What's tangled, what's wasting time, and what 'done' actually looks like to you." },
+  { n: "02", t: "Strip",     d: "Cut to the essential. Lean thinking applied first — remove the steps, tools, and words that don't earn their place." },
+  { n: "03", t: "Build",     d: "Ship a working version fast. Vibe-coded with AI, single-file where it can be, no over-engineering and nothing you can't maintain." },
+  { n: "04", t: "Sharpen",   d: "Use it, find the friction, iterate. Real feedback from real use beats a perfect plan every time." },
+  { n: "05", t: "Hand over", d: "You own it. Clean and documented — whether it's a lesson plan, a program, or a codebase. No lock-in, no mystery." },
+];
+
+function Process({ p, serif }) {
+  return (
+    <section id="process" style={{ padding: "140px 40px" }}>
+      <div style={{ maxWidth: 1320, margin: "0 auto" }}>
+        <Reveal>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 60, marginBottom: 80 }}>
+            <SectionLabel p={p} n="04" label="How I work" />
+            <div>
+              <h2 style={{ fontFamily: serif, fontSize: "clamp(40px, 5vw, 76px)", lineHeight: 1, letterSpacing: "-0.02em", margin: 0, color: p.fg, fontWeight: 400 }}>
+                Five moves. No long ramp. <em style={{ fontStyle: "italic", color: p.accent }}>Something working, fast.</em>
+              </h2>
+              <p style={{ fontSize: 17, lineHeight: 1.6, color: p.muted, maxWidth: 620, marginTop: 24, textWrap: "pretty" }}>
+                Same loop whether it's a lesson, a training block, or an app. The point
+                isn't a heavy process — it's getting to a real, usable result while the
+                idea is still warm.
+              </p>
+            </div>
+          </div>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", borderTop: `0.5px solid ${p.line}` }}>
+          {PHASES.map((s, i) => (
+            <Reveal key={s.n} delay={i * 0.08}>
+              <div style={{
+                padding: "40px 24px 40px 0", paddingLeft: i > 0 ? 24 : 0,
+                borderRight: i < 4 ? `0.5px solid ${p.line}` : "none",
+                borderBottom: `0.5px solid ${p.line}`,
+                minHeight: 280, display: "flex", flexDirection: "column", justifyContent: "space-between",
+                position: "relative",
+              }}>
+                <div>
+                  <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: p.accent, letterSpacing: "0.05em", marginBottom: 28 }}>/ {s.n}</div>
+                  <h3 style={{ fontFamily: serif, fontSize: 38, lineHeight: 1, letterSpacing: "-0.02em", color: p.fg, fontWeight: 400, margin: "0 0 16px" }}>
+                    {s.t}
+                  </h3>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.6, color: p.muted, textWrap: "pretty" }}>{s.d}</p>
+                </div>
+                {i < 4 && (
+                  <div style={{ position: "absolute", right: -8, top: 56, fontFamily: serif, fontStyle: "italic", fontSize: 24, color: p.muted }}>→</div>
+                )}
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Case studies ────────────────────────────────────────────────────────────
+const CASES = [
+  {
+    location: "MULTI-AGENT OS · PYTHON",
+    tag: "Agent orchestration · DeepSeek V3 · Redis Streams",
+    client: "AgentMesh",
+    d: "A hierarchical harness that lets one orchestrator decompose a goal and dispatch it across several Hermes sub-agents. File-backed state survives crashes; a recursive learner reads past episodes and rewrites the harness's own strategy — four accepted evolutions and counting. The newest, deepest thing I've built.",
+    stats: [["Recursive", "Self-evolving harness"], ["3-layer", "Episodic memory"], ["+4.8", "Benchmark lift"], ["Crash-safe", "File-backed state"]],
+  },
+  {
+    location: "VISUAL BUILDER · REACT",
+    tag: "Workflow automation · Node canvas · Telegram",
+    client: "Hermes Workflows",
+    d: "A drag-and-drop canvas for composing agent workflows that export to runnable Python. Trigger a run from a Telegram message and watch the nodes light up live on the board — fetch, AI rewrite, build, deploy — then get the result back in chat. Three theme modes, frosted-glass nodes, WebSocket sync.",
+    stats: [["Drag-drop", "Node canvas"], ["Telegram", "Remote triggers"], ["Live board", "WebSocket sync"], ["→ Python", "Code export"]],
+  },
+  {
+    location: "DESKTOP APP · ELECTRON",
+    tag: "Productivity · React 19 · OpenAI + Ollama",
+    client: "ClipAI Pro",
+    d: "A clipboard manager that actually thinks. Every copy is captured, searchable, and analyzed by AI — local via Ollama or cloud via OpenAI. Built on Electron + React with a better-sqlite3 store and packaged for the Microsoft Store.",
+    stats: [["Electron", "Cross-platform"], ["Local AI", "Ollama option"], ["SQLite", "Fast history"], ["MS Store", "Packaged"]],
+  },
+  {
+    location: "WEB APP · VANILLA JS",
+    tag: "AI travel planning · Single-file · OpenAI-compatible",
+    client: "Travel Studio IQ",
+    d: "A no-backend travel command center: bilateral visa and relations lookup, airline baggage rules, smart packing checklists, a live currency converter, world clocks, and document analysis — all driven by an AI model inside one self-contained HTML file you can run anywhere.",
+    stats: [["Single file", "No backend"], ["Live FX", "Currency API"], ["Doc AI", "Upload & analyze"], ["Portable", "Runs anywhere"]],
+  },
+  {
+    location: "NEWS PLATFORM · HTML/JS",
+    tag: "Daily publishing · Swappable feed · Live",
+    client: "Serbia Today",
+    d: "A daily news site fed by a single swappable articles file — write or AI-draft the day's stories, drop in the images, publish. Animated star-field, breaking-news ticker, 3D card hover, monetization built in. Live at serbia-today.wuaze.com.",
+    stats: [["Daily", "Publishing flow"], ["1 file", "Swappable feed"], ["Live", "serbia-today.wuaze.com"], ["Monetized", "Ko-fi + PayPal"]],
+  },
+  {
+    location: "FICTION SERIES · INTERACTIVE",
+    tag: "Cyberpunk worldbuilding · Original IP",
+    client: "Beograd 2179",
+    d: "An original cyberpunk saga set in a 2179 Belgrade — three chapters, roughly 15,000 words, a cast led by Mila Vukić, rendered in a dark interactive reader with Orbitron type and color-coded episodes. Proof that the toolchain that ships software ships worlds too.",
+    stats: [["3 chapters", "~15,000 words"], ["Original", "Worldbuilt IP"], ["Interactive", "Dark reader"], ["Ongoing", "More coming"]],
+  },
+];
+
+function Cases({ p, serif }) {
+  return (
+    <section id="cases" style={{ padding: "120px 40px", background: p.panel, borderTop: `0.5px solid ${p.line}`, borderBottom: `0.5px solid ${p.line}` }}>
+      <div style={{ maxWidth: 1320, margin: "0 auto" }}>
+        <Reveal>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 60, marginBottom: 64 }}>
+            <SectionLabel p={p} n="05" label="Selected work" />
+            <div>
+              <h2 style={{ fontFamily: serif, fontSize: "clamp(40px, 5vw, 76px)", lineHeight: 1, letterSpacing: "-0.02em", margin: 0, color: p.fg, fontWeight: 400 }}>
+                Six builds. Different stacks. <em style={{ fontStyle: "italic", color: p.accent }}>One way of thinking.</em>
+              </h2>
+              <p style={{ fontSize: 17, lineHeight: 1.6, color: p.muted, maxWidth: 620, marginTop: 24, textWrap: "pretty" }}>
+                Agents, desktop apps, web tools, a news platform, a fiction world. They
+                share no framework — they share an approach: strip it down, build it
+                lean, ship the real thing.
+              </p>
+            </div>
+          </div>
+        </Reveal>
+        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+          {CASES.map((c, i) => (
+            <Reveal key={i} delay={i * 0.08}>
+              <CaseCard p={p} serif={serif} c={c} />
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CaseCard({ p, serif, c }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <article onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)} style={{
+      background: p.bg, borderRadius: 22, padding: 40, border: `0.5px solid ${p.line}`,
+      display: "grid", gridTemplateColumns: "1fr 1fr", gap: 56, alignItems: "start",
+      transition: "transform .4s cubic-bezier(.2,.7,.2,1), box-shadow .4s",
+      transform: hover ? "translateY(-4px)" : "none",
+      boxShadow: hover ? "0 30px 60px -30px rgba(0,0,0,.25)" : "0 1px 0 rgba(0,0,0,.02)",
+      cursor: "pointer",
+    }}>
+      <div>
+        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: p.muted, letterSpacing: "0.08em", marginBottom: 14 }}>{c.location}</div>
+        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: p.fg, letterSpacing: "0.04em", marginBottom: 20 }}>{c.tag}</div>
+        <h3 style={{ fontFamily: serif, fontSize: 44, lineHeight: 1.05, letterSpacing: "-0.02em", color: p.fg, fontWeight: 400, margin: "0 0 20px" }}>
+          {c.client}
+        </h3>
+        <p style={{ fontSize: 15.5, lineHeight: 1.65, color: p.muted, margin: 0, textWrap: "pretty", maxWidth: 520 }}>{c.d}</p>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px 32px", paddingLeft: 20, borderLeft: `0.5px solid ${p.line}` }}>
+        {c.stats.map(([v, l], i) => (
+          <div key={i}>
+            <div style={{ fontFamily: serif, fontSize: 44, color: p.fg, lineHeight: 1, letterSpacing: "-0.02em" }}>{v}</div>
+            <div style={{ fontSize: 11, color: p.muted, marginTop: 8, fontFamily: "JetBrains Mono, monospace", textTransform: "uppercase", letterSpacing: "0.06em" }}>{l}</div>
+          </div>
+        ))}
+      </div>
+    </article>
+  );
+}
+
+// ─── Proof in numbers ────────────────────────────────────────────────────────
+function Proof({ p, serif }) {
+  const rows = [
+    ["10+", "Apps and tools shipped"],
+    ["4", "Languages I work in"],
+    ["3", "Disciplines under one roof"],
+    ["15 yrs", "Coaching and teaching"],
+    ["1-file", "Apps that need no backend"],
+    ["100%", "Built by one person"],
+  ];
+  return (
+    <section id="results" style={{ padding: "140px 40px" }}>
+      <div style={{ maxWidth: 1320, margin: "0 auto" }}>
+        <Reveal>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 60, marginBottom: 64 }}>
+            <SectionLabel p={p} n="06" label="Proof in numbers" />
+            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 12, color: p.muted, letterSpacing: "0.05em", lineHeight: 1.7 }}>
+              // What one multidisciplinary builder actually ships<br />
+              // Da Nang, Vietnam · working globally
+            </div>
+          </div>
+        </Reveal>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", borderTop: `0.5px solid ${p.line}`, borderLeft: `0.5px solid ${p.line}` }}>
+          {rows.map(([v, l], i) => (
+            <Reveal key={i} delay={(i % 3) * 0.06}>
+              <div style={{ padding: "48px 36px", borderRight: `0.5px solid ${p.line}`, borderBottom: `0.5px solid ${p.line}`, minHeight: 240, display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+                <div style={{ fontFamily: serif, fontSize: 72, lineHeight: 0.95, letterSpacing: "-0.03em", color: p.fg }}>{v}</div>
+                <div style={{ fontSize: 14, color: p.muted, fontFamily: "JetBrains Mono, monospace", textTransform: "uppercase", letterSpacing: "0.05em", marginTop: 16 }}>{l}</div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── CTA ─────────────────────────────────────────────────────────────────────
+function CTA({ p, serif }) {
+  return (
+    <section id="contact" style={{ padding: "140px 40px", borderTop: `0.5px solid ${p.line}` }}>
+      <div style={{ maxWidth: 1320, margin: "0 auto", display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: 80, alignItems: "end" }}>
+        <Reveal>
+          <h2 style={{ fontFamily: serif, fontSize: "clamp(56px, 8vw, 140px)", lineHeight: 0.95, letterSpacing: "-0.03em", margin: 0, color: p.fg, fontWeight: 400 }}>
+            Ready to <em style={{ fontStyle: "italic", color: p.accent }}>build smarter?</em>
+          </h2>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+            <p style={{ fontSize: 17, lineHeight: 1.6, color: p.muted, margin: 0, textWrap: "pretty" }}>
+              Tell me what's tangled — a lesson that isn't landing, a process bleeding
+              time, an app idea stuck in your head. First call is free, thirty minutes,
+              no slide deck. We'll figure out whether I'm the right person to build it.
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <a href="mailto:leanproiq@gmail.com" style={{
+                padding: "20px 28px", borderRadius: 999, background: p.chip, color: p.chipFg,
+                fontSize: 16, fontWeight: 500, textDecoration: "none",
+                display: "inline-flex", alignItems: "center", justifyContent: "space-between",
+                transition: "transform .2s",
+              }} onMouseEnter={e => e.currentTarget.style.transform = "translateY(-2px)"} onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}>
+                <span>📧 leanproiq@gmail.com</span> <span style={{ fontFamily: serif, fontStyle: "italic" }}>→</span>
+              </a>
+              <a href="tel:+84376125323" style={{
+                padding: "20px 28px", borderRadius: 999, background: "transparent",
+                border: `0.5px solid ${p.line}`, color: p.fg,
+                fontSize: 16, textDecoration: "none",
+                display: "inline-flex", alignItems: "center", justifyContent: "space-between",
+              }}>
+                <span>📱 +84 376 125 323 · Zalo</span> <span style={{ fontFamily: serif, fontStyle: "italic" }}>↗</span>
+              </a>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+function Footer({ p, serif }) {
+  return (
+    <footer style={{ padding: "60px 40px 40px", borderTop: `0.5px solid ${p.line}` }}>
+      <div style={{ maxWidth: 1320, margin: "0 auto", display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr", gap: 60, alignItems: "start" }}>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+            <Logo p={p} size={28} />
+            <span style={{ fontFamily: serif, fontSize: 22 }}>
+              Lean Progress <em style={{ fontStyle: "italic", color: p.accent }}>IQ</em>
+            </span>
+          </div>
+          <p style={{ fontSize: 13, color: p.muted, lineHeight: 1.6, maxWidth: 340, margin: 0 }}>
+            English coaching, strength training, and AI builds — fused with Lean
+            thinking. Da Nang, Vietnam · working globally.
+          </p>
+        </div>
+        {[
+          ["What I do", ["AI App Development", "English Coaching", "Lean Consulting", "Strength & Conditioning", "Creative Production"]],
+          ["Explore", ["The Thread", "How I Work", "Selected Work", "Field Notes", "Contact"]],
+          ["Get in touch", ["leanproiq@gmail.com", "+84 376 125 323 · Zalo", "YouTube · @DuleMilo", "TikTok · @dulemilo", "Ko-fi · /dulemilo"]],
+        ].map(([head, items]) => (
+          <div key={head}>
+            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: p.muted, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 16 }}>{head}</div>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+              {items.map(i => <li key={i}><a href="#" style={{ color: p.fg, textDecoration: "none", fontSize: 14 }}>{i}</a></li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+      <div style={{ maxWidth: 1320, margin: "60px auto 0", paddingTop: 24, borderTop: `0.5px solid ${p.line}`, display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12, color: p.muted, fontFamily: "JetBrains Mono, monospace", letterSpacing: "0.04em" }}>
+        <span>© 2026 Lean Progress IQ. All rights reserved.</span>
+        <span>// built lean · shipped fast · Da Nang, VN</span>
+      </div>
+    </footer>
+  );
+}
+
+// ─── App ─────────────────────────────────────────────────────────────────────
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "paletteKey": "cream",
+  "serifKey": "instrument",
+  "background": "spheres",
+  "density": 1,
+  "dark": false
+}/*EDITMODE-END*/;
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const paletteKey = t.dark ? "ink" : (t.paletteKey === "ink" ? "cream" : t.paletteKey);
+  const p = PALETTES[paletteKey] || PALETTES.cream;
+  const serif = SERIFS[t.serifKey] || SERIFS.instrument;
+
+  useEffect(() => {
+    document.body.style.background = p.bg;
+    document.body.style.color = p.fg;
+  }, [p]);
+
+  return (
+    <div style={{ background: p.bg, color: p.fg, fontFamily: '"Geist", ui-sans-serif, system-ui, -apple-system, sans-serif', fontSize: 15, lineHeight: 1.5, minHeight: "100vh" }}>
+      <Nav p={p} serif={serif} dark={t.dark} onDark={() => setTweak("dark", !t.dark)} />
+      <Hero p={p} serif={serif} treatment={t.background} density={t.density} />
+      <Ticker p={p} serif={serif} />
+      <Belief p={p} serif={serif} />
+      <Services p={p} serif={serif} />
+      <Pulse p={p} serif={serif} />
+      <Process p={p} serif={serif} />
+      <Cases p={p} serif={serif} />
+      <Proof p={p} serif={serif} />
+      <CTA p={p} serif={serif} />
+      <Footer p={p} serif={serif} />
+
+      <TweaksPanel>
+        <TweakSection label="Palette" />
+        <TweakColor label="Theme" value={[p.bg, p.fg, p.accent]}
+          options={[
+            [PALETTES.cream.bg, PALETTES.cream.fg, PALETTES.cream.accent],
+            [PALETTES.slate.bg, PALETTES.slate.fg, PALETTES.slate.accent],
+            [PALETTES.ink.bg,   PALETTES.ink.fg,   PALETTES.ink.accent],
+            [PALETTES.paper.bg, PALETTES.paper.fg, PALETTES.paper.accent],
+          ]}
+          onChange={(v) => {
+            const match = Object.entries(PALETTES).find(([, q]) => q.bg === v[0]);
+            if (match) { setTweak("paletteKey", match[0]); setTweak("dark", match[0] === "ink"); }
+          }} />
+        <TweakToggle label="Dark mode" value={t.dark} onChange={(v) => setTweak("dark", v)} />
+        <TweakSection label="Typography" />
+        <TweakSelect label="Display serif" value={t.serifKey}
+          options={[
+            { label: "Instrument Serif", value: "instrument" },
+            { label: "EB Garamond",      value: "eb" },
+            { label: "Playfair Display", value: "playfair" },
+          ]}
+          onChange={(v) => setTweak("serifKey", v)} />
+        <TweakSection label="Hero background" />
+        <TweakRadio label="Treatment" value={t.background}
+          options={["spheres", "rings", "grid"]}
+          onChange={(v) => setTweak("background", v)} />
+        <TweakSlider label="Density" value={t.density} min={0.4} max={1.8} step={0.1}
+          onChange={(v) => setTweak("density", v)} />
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

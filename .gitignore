@@ -1,0 +1,9 @@
+.env
+*.db
+workspace/
+__pycache__/
+*.pyc
+.venv/
+hermes_memory.json
+*.zip
+.claude/

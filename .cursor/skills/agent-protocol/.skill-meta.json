@@ -1,0 +1,13 @@
+{
+  "sourceType": "github",
+  "source": "github",
+  "url": "https://github.com/alirezarezvani/claude-skills",
+  "repo": "alirezarezvani/claude-skills",
+  "ref": null,
+  "subpath": "c-level-advisor/skills/agent-protocol",
+  "installSource": "alirezarezvani/claude-skills/c-level-advisor/skills/agent-protocol",
+  "skillName": "agent-protocol",
+  "scope": "legacy",
+  "installedAt": "2026-05-27T16:42:21.792Z",
+  "updatedAt": "2026-05-27T16:42:21.792Z"
+}

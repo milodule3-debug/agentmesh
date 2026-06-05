@@ -1,0 +1,46 @@
+RECURSIVE LEARNING IN AGENT ORCHESTRATION — VIDEO SCRIPT
+========================================================
+Total duration: ~90 seconds | 8 slides | English narration
+
+---
+SLIDE 1 — [8 seconds]
+---
+"Have you ever wondered how artificial intelligence learns from its mistakes? Today I'll explain a concept called Recursive Learning in Agent Orchestration — in a way anyone can understand."
+
+---
+SLIDE 2 — [12 seconds]
+---
+"Imagine a manager with a team of four specialists: a researcher who finds information, a coder who writes software, a writer who creates reports, and an organizer who manages files. The manager — called the Orchestrator — delegates tasks and tracks results."
+
+---
+SLIDE 3 — [14 seconds]
+---
+"Here's the problem: without learning, agents repeat the same mistakes. A researcher tries to access a website — it fails. They try again — it fails again. And again. With recursive learning, every failure is analyzed, a lesson is extracted, and next time, the agent does better."
+
+---
+SLIDE 4 — [14 seconds]
+---
+"Here's how it works: the agent receives a task, executes it, and if it fails, it records exactly what went wrong. Then AI analyzes those failures, extracts concrete rules, and changes the agent's behavior. The cycle is simple: work, fail, learn, improve."
+
+---
+SLIDE 5 — [12 seconds]
+---
+"There are two levels of learning. Level one: each agent analyzes its own failures and changes its own behavior — like a student learning from test results. Level two: the orchestrator analyzes failures across the whole team and changes its strategy — like a manager optimizing their team."
+
+---
+SLIDE 6 — [12 seconds]
+---
+"The agent stores information in four memory layers. Episodic — raw notes about every task. Semantic — learned rules and patterns. Procedural — statistics on which tools work well. And working — the current scratchpad. Like the human brain, each layer stores different information."
+
+---
+SLIDE 7 — [10 seconds]
+---
+"Not every lesson passes! The system has a filter called the Acceptance Gate. Generic advice like 'be more careful' gets rejected. Specific rules like 'check if the key exists before accessing it' get accepted. Research shows that one good lesson is worth more than ten bad ones."
+
+---
+SLIDE 8 — [10 seconds]
+---
+"The results are impressive: plus 4.8 points on coding tasks, plus 2.7 on system tasks. The conclusion? A system that analyzes its own failures and learns from them gets smarter every day. Like a child learning to walk — they fall, they get up, and next time they fall less. Until they start running."
+
+========================================================
+END OF SCRIPT

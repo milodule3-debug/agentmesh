@@ -1,0 +1,11 @@
+{
+  "name": "analyze_csv",
+  "description": "Load and analyze a CSV file. Returns column stats, row count, and data preview.",
+  "parameters": {
+    "path": {"type": "string", "description": "Path to CSV file"},
+    "max_rows": {"type": "integer", "description": "Max rows to preview", "default": 10}
+  },
+  "required": ["path"],
+  "tags": ["data", "io"],
+  "safe": true
+}

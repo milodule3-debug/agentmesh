@@ -1,0 +1,29 @@
+# Gemma Image Generation Prompt
+
+Create a series of 8 simple, clean infographic illustrations for a presentation about "Recursive Learning in Agent Orchestration". Each image should be easy to understand for non-technical audience, with soft colors (purple, blue, cyan gradients on dark background #0a0a1a).
+
+**Slide 1 - Title Card:**
+A brain with recursive arrows forming a loop, surrounded by small robot/agent icons. Clean modern flat design. Title: "How AI Agents Learn From Mistakes"
+
+**Slide 2 - Team Structure:**
+A manager figure (orchestrator) at top with 4 specialists below connected by arrows: Researcher (magnifying glass), Coder (laptop), Writer (pen), Organizer (folder). Style: flat icons on dark background.
+
+**Slide 3 - Before/After Comparison:**
+Split image. Left side (red tones): same error happening 3 times in a row with X marks. Right side (green tones): error → thinking/analysis → lesson extracted → success with checkmark.
+
+**Slide 4 - Learning Cycle:**
+Circular flow diagram with 4 stages connected by arrows: Task → Execution → Success or Failure → Evolution (AI analyzing) → Better Next Time. Use icons for each stage.
+
+**Slide 5 - Two Levels:**
+Bottom level: single person/agent looking at their own test results and taking notes. Top level: manager looking at team dashboard and reorganizing assignments. Arrow connecting both levels.
+
+**Slide 6 - Memory Layers:**
+Four horizontal layers stacked like brain sections, each with distinct color and icon: Episodna (notebook, purple), Semantic (lightbulb, blue), Procedural (bar chart, cyan), Working (sticky notes, green). Brief labels only.
+
+**Slide 7 - Acceptance Gate:**
+A gate/filter in the center. Left side: vague generic advice ("be more careful") being rejected with red X. Right side: specific technical rules being accepted with green checkmark. Arrows showing flow.
+
+**Slide 8 - Results Summary:**
+Upward trending graphs and charts. Key numbers displayed: +4.8, +2.7, 50%. Bottom: a simple tagline "Every failure makes the system smarter" with a small child learning to walk icon.
+
+Style: Modern flat design, minimal text, icon-based, accessible to non-technical viewers.

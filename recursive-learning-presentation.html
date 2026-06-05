@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recursive Learning in Agent Orchestration</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #0a0a1a; color: #e0e0e0; }
+  .slide { width: 100vw; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 60px 80px; position: relative; overflow: hidden; }
+  .slide::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 30% 20%, rgba(100, 50, 200, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, rgba(50, 150, 255, 0.1) 0%, transparent 50%); z-index: 0; }
+  > * { position: relative; z-index: 1; }
+  h1 { font-size: 3.5em; text-align: center; margin-bottom: 20px; background: linear-gradient(135deg, #a855f7, #3b82f6, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  h2 { font-size: 2.5em; text-align: center; margin-bottom: 40px; color: #a855f7; }
+  h3 { font-size: 1.8em; margin-bottom: 20px; color: #3b82f6; }
+  p { font-size: 1.3em; line-height: 1.8; max-width: 900px; text-align: center; margin-bottom: 20px; }
+  .subtitle { font-size: 1.5em; color: #94a3b8; text-align: center; margin-bottom: 40px; }
+  .diagram { display: flex; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap; margin: 40px 0; }
+  .box { background: rgba(100, 50, 200, 0.15); border: 2px solid rgba(168, 85, 247, 0.4); border-radius: 16px; padding: 25px 35px; text-align: center; min-width: 180px; transition: all 0.3s; }
+  .box:hover { background: rgba(100, 50, 200, 0.25); transform: translateY(-5px); }
+  .box .icon { font-size: 2.5em; margin-bottom: 10px; }
+  .box .label { font-size: 1.1em; font-weight: 600; color: #c4b5fd; }
+  .box .desc { font-size: 0.85em; color: #94a3b8; margin-top: 8px; }
+  .arrow { font-size: 2em; color: #60a5fa; }
+  .flow { display: flex; flex-direction: column; align-items: center; gap: 15px; margin: 30px 0; }
+  .flow-row { display: flex; align-items: center; gap: 20px; }
+  .highlight { background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(59, 130, 246, 0.2)); border: 2px solid #a855f7; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 1000px; margin: 30px 0; }
+  .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 30px; }
+  .card h3 { color: #06b6d4; font-size: 1.4em; margin-bottom: 15px; }
+  .card p { font-size: 1.05em; text-align: left; }
+  .card ul { list-style: none; padding: 0; }
+  .card ul li { padding: 8px 0; font-size: 1.05em; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .card ul li::before { content: '→ '; color: #a855f7; font-weight: bold; }
+  .comparison { display: flex; gap: 40px; margin: 30px 0; }
+  .comparison .before, .comparison .after { flex: 1; padding: 30px; border-radius: 16px; text-align: center; }
+  .comparison .before { background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3); }
+  .comparison .after { background: rgba(34, 197, 94, 0.1); border: 2px solid rgba(34, 197, 94, 03); }
+  .comparison h3 { margin-bottom: 15px; }
+  .comparison .before h3 { color: #f87171; }
+  .comparison .after h3 { color: #4ade80; }
+  .slide-number { position: absolute; bottom: 20px; right: 30px; font-size: 0.9em; color: #4a5568; }
+  .analogy { background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 25px 35px; border-radius: 0 12px 12px 0; margin: 30px 0; max-width: 800px; }
+  .analogy p { text-align: left; font-size: 1.2em; }
+  .analogy .emoji { font-size: 1.5em; margin-right: 10px; }
+  .key-insight { background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(6, 182, 212, 0.15)); border: 2px solid rgba(168, 85, 247, 0.3); border-radius: 16px; padding: 30px 40px; margin: 30px 0; max-width: 850px; text-align: center; }
+  .key-insight p { font-size: 1.3em; color: #e0e0e0; }
+  .key-insight strong { color: #a855f7; }
+  .memory-layers { display: flex; flex-direction: column; gap: 15px; margin: 30px 0; max-width: 700px; }
+  .memory-layer { display: flex; align-items: center; gap: 20px; padding: 18px 25px; border-radius: 12px; }
+  .memory-layer .icon { font-size: 2em; min-width: 50px; text-align: center; }
+  .memory-layer .info h4 { font-size: 1.2em; margin-bottom: 5px; }
+  .memory-layer .info p { font-size: 0.95em; text-align: left; margin: 0; }
+  .layer-episodic { background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.3); }
+  .layer-semantic { background: rgba(59, 130, 246, 0.12); border: 1px solid rgba(59, 130, 246, 0.3); }
+  .layer-procedural { background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3); }
+  .layer-working { background: rgba(34, 197, 94, 0.12); border: 1px solid rgba(34, 197, 94, 0.3); }
+</style>
+</head>
+<body>
+
+<!-- SLIDE 1: Title -->
+<div class="slide">
+  <div style="font-size:4em; margin-bottom:20px;">🧠</div>
+  <h1>Recursive Learning<br>in Agent Orchestration</h1>
+  <p class="subtitle">How AI agents learn from their mistakes and get smarter every day</p>
+  <p style="color:#64748b; margin-top:40px;">A simple explanation for everyone — no IT background needed</p>
+  <div class="slide-number">1 / 8</div>
+</div>
+
+<!-- SLIDE 2: What is Agent Orchestration -->
+<div class="slide">
+  <h2>🤖 What is Agent Orchestration?</h2>
+  <div class="analogy">
+    <p><span class="emoji">🏢</span> Imagine a <strong>manager</strong> with a team of 4 specialists:</p>
+  </div>
+  <div class="diagram">
+    <div class="box">
+      <div class="icon">🔍</div>
+      <div class="label">Researcher</div>
+      <div class="desc">Finds information on the web</div>
+    </div>
+    <div class="box">
+      <div class="icon">💻</div>
+      <div class="label">Coder</div>
+      <div class="desc">Writes and tests code</div>
+    </div>
+    <div class="box">
+      <div class="icon">✍️</div>
+      <div class="label">Writer</div>
+      <div class="desc">Writes reports and content</div>
+    </div>
+    <div class="box">
+      <div class="icon">📁</div>
+      <div class="label">Organizer</div>
+      <div class="desc">Manages files and data</div>
+    </div>
+  </div>
+  <div class="diagram" style="margin-top:10px;">
+    <div class="arrow">⬆️</div>
+  </div>
+  <div class="box highlight" style="min-width:300px;">
+    <div class="icon">🎯</div>
+    <div class="label">Orchestrator (Manager)</div>
+    <div class="desc">Delegates tasks, monitors results, decides next steps</div>
+  </div>
+  <div class="slide-number">2 / 8</div>
+</div>
+
+<!-- SLIDE 3: The Problem -->
+<div class="slide">
+  <h2>❌ Problem: Agents Repeat the Same Mistakes</h2>
+  <div class="comparison">
+    <div class="before">
+      <h3>Without Learning</h3>
+      <p>🔍 Researcher tries to access a site → <strong>fails</strong></p>
+      <p>🔍 Tries the same thing again → <strong>fails again</strong></p>
+      <p>🔍 Same thing a third time → <strong>crash</strong></p>
+      <p style="margin-top:15px; color:#f87171;">Same error pattern, zero progress</p>
+    </div>
+    <div class="after">
+      <h3>With Recursive Learning</h3>
+      <p>🔍 Researcher tries → <strong>fails</strong></p>
+      <p>🧠 Analyzes why → <strong>learns a lesson</strong></p>
+      <p>🔍 Tries differently → <strong>success!</strong></p>
+      <p style="margin-top:15px; color:#4ade80;">Every failure = a new lesson</p>
+    </div>
+  </div>
+  <div class="key-insight">
+    <p><strong>Key idea:</strong> Instead of failing the same way repeatedly, the agent <strong>analyzes its errors</strong> and <strong>changes its behavior</strong> for next time.</p>
+  </div>
+  <div class="slide-number">3 / 8</div>
+</div>
+
+<!-- SLIDE 4: How Recursive Learning Works -->
+<div class="slide">
+  <h2>🔄 How Does Recursive Learning Work?</h2>
+  <div class="flow">
+    <div class="box">
+      <div class="icon">📋</div>
+      <div class="label">1. Task</div>
+      <div class="desc">Agent receives a job</div>
+    </div>
+    <div class="arrow">⬇️</div>
+    <div class="box">
+      <div class="icon">⚡</div>
+      <div class="label">2. Execution</div>
+      <div class="desc">Agent does the work</div>
+    </div>
+    <div class="arrow">⬇️</div>
+    <div class="flow-row">
+      <div class="box" style="border-color:rgba(34,197,94,0.4);">
+        <div class="icon">✅</div>
+        <div class="label">Success</div>
+        <div class="desc">Save as a winning example</div>
+      </div>
+      <div class="box" style="border-color:rgba(239,68,68,0.4);">
+        <div class="icon">❌</div>
+        <div class="label">Failure</div>
+        <div class="desc">Record EXACTLY what went wrong</div>
+      </div>
+    </div>
+    <div class="arrow">⬇️</div>
+    <div class="box highlight">
+      <div class="icon">🧠</div>
+      <div class="label">3. Evolution</div>
+      <div class="desc">AI analyzes failures → extracts rules → changes behavior</div>
+    </div>
+    <div class="arrow">⬇️</div>
+    <div class="box" style="border-color:rgba(168,85,247,0.6);">
+      <div class="icon">🚀</div>
+      <div class="label">4. Next time: better</div>
+      <div class="desc">Agent uses learned lessons</div>
+    </div>
+  </div>
+  <div class="slide-number">4 / 8</div>
+</div>
+
+<!-- SLIDE 5: Two Levels of Learning -->
+<div class="slide">
+  <h2>📊 Two Levels of Learning</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>🧑‍🎓 Level 1: Individual Agent</h3>
+      <ul>
+        <li>Agent analyzes ITS OWN failures</li>
+        <li>Extracts concrete, specific rules</li>
+        <li>Modifies ITS OWN system prompt</li>
+        <li>Example: "Always check if file exists before reading"</li>
+      </ul>
+      <p style="margin-top:15px; color:#94a3b8; font-size:0.95em;">Like a student learning from their test results</p>
+    </div>
+    <div class="card">
+      <h3>👔 Level 2: Orchestrator (Manager)</h3>
+      <ul>
+        <li>Analyzes failures across the WHOLE team</li>
+        <li>Changes task assignment STRATEGY</li>
+        <li>Optimizes budgets (time, tokens)</li>
+        <li>Example: "Don't give web search tasks to the agent that keeps failing"</li>
+      </ul>
+      <p style="margin-top:15px; color:#94a3b8; font-size:0.95em;">Like a manager optimizing their team</p>
+    </div>
+  </div>
+  <div class="key-insight">
+    <p>These two levels work <strong>simultaneously</strong> — agents learn individually, and the manager learns how to assign work better.</p>
+  </div>
+  <div class="slide-number">5 / 8</div>
+</div>
+
+<!-- SLIDE 6: Memory System -->
+<div class="slide">
+  <h2>🧠 Agent Memory — 4 Layers</h2>
+  <p style="margin-bottom:30px;">Think of it like the human brain — each layer stores a different type of information:</p>
+  <div class="memory-layers">
+    <div class="memory-layer layer-episodic">
+      <div class="icon">📖</div>
+      <div class="info">
+        <h4 style="color:#c4b5fd;">Episodic Memory</h4>
+        <p>RAW notes about every task — what it did, how many tokens it burned, what crashed. NEVER summarized, kept verbatim.</p>
+      </div>
+    </div>
+    <div class="memory-layer layer-semantic">
+      <div class="icon">💡</div>
+      <div class="info">
+        <h4 style="color:#60a5fa;">Semantic Memory</h4>
+        <p>Learned rules and lessons — "Always check the API response before parsing." This gets injected into every future task.</p>
+      </div>
+    </div>
+    <div class="memory-layer layer-procedural">
+      <div class="icon">📊</div>
+      <div class="info">
+        <h4 style="color:#22d3ee;">Procedural Memory</h4>
+        <p>Statistics on which tools work well and which don't. E.g.: "web_search = 90% success, http_get = 60% success."</p>
+      </div>
+    </div>
+    <div class="memory-layer layer-working">
+      <div class="icon">📝</div>
+      <div class="info">
+        <h4 style="color:#4ade80;">Working Memory</h4>
+        <p>Current scratchpad — what the agent is doing RIGHT NOW. Saved to disk, survives crashes.</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-number">6 / 8</div>
+</div>
+
+<!-- SLIDE 7: Acceptance Gate -->
+<div class="slide">
+  <h2>🚦 Acceptance Gate — Lesson Filter</h2>
+  <p style="margin-bottom:30px;">Not every lesson passes! The system has <strong>strict filters</strong>:</p>
+  <div class="grid">
+    <div class="card" style="border-color:rgba(239,68,68,0.3);">
+      <h3 style="color:#f87171;">❌ Rejected Lessons</h3>
+      <ul>
+        <li>"Be more careful" — too generic</li>
+        <li>"Check everything" — doesn't say WHAT</li>
+        <li>"Try again" — no rule given</li>
+        <li>Shorter than 30 characters</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:rgba(34,197,94,0.3);">
+      <h3 style="color:#4ade80;">✅ Accepted Lessons</h3>
+      <ul>
+        <li>"Check if 'choices' key exists in JSON before accessing"</li>
+        <li>"Log the full API response on any error"</li>
+        <li>"Use try/except for all HTTP calls"</li>
+        <li>Concrete, measurable, testable</li>
+      </ul>
+    </div>
+  </div>
+  <div class="key-insight">
+    <p><strong>Why?</strong> Research (Tsinghua 2026) shows that <strong>narrowing the attempt loop</strong> helps, but <strong>broadening</strong> hurts. Better 1 good lesson than 10 bad ones.</p>
+  </div>
+  <div class="slide-number">7 / 8</div>
+</div>
+
+<!-- SLIDE 8: Results & Summary -->
+<div class="slide">
+  <h2>📈 Results & Conclusion</h2>
+  <div class="diagram" style="margin-bottom:40px;">
+    <div class="box" style="border-color:rgba(34,197,94,0.4);">
+      <div class="icon">📈</div>
+      <div class="label">+4.8 points</div>
+      <div class="desc">SWE-bench (coding tasks)</div>
+    </div>
+    <div class="box" style="border-color:rgba(34,197,94,0.4);">
+      <div class="icon">📈</div>
+      <div class="label">+2.7 points</div>
+      <div class="desc">OS-World (system tasks)</div>
+    </div>
+    <div class="box" style="border-color:rgba(168,85,247,0.4);">
+      <div class="icon">🎯</div>
+      <div class="label">50% → 34.6%</div>
+      <div class="desc">Without raw traces (Stanford)</div>
+    </div>
+  </div>
+  <div class="key-insight">
+    <p><strong>Summary for non-technical people:</strong></p>
+    <p style="margin-top:15px;">🤖 Agents do tasks → ❌ Failures are recorded → 🧠 AI analyzes root causes → 📝 Extracts rules → 🚀 Next time works better</p>
+    <p style="margin-top:15px;">This is <strong>recursive learning</strong> — a system that <strong>improves itself</strong> every time something goes wrong.</p>
+  </div>
+  <div class="analogy" style="margin-top:30px;">
+    <p><span class="emoji">🎓</span> Like a child learning to walk — falls, gets up, analyzes, and next time falls less. Until they start running.</p>
+  </div>
+  <div class="slide-number">8 / 8</div>
+</div>
+
+</body>
+</html>

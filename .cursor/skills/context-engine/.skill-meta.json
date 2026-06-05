@@ -1,0 +1,13 @@
+{
+  "sourceType": "github",
+  "source": "github",
+  "url": "https://github.com/alirezarezvani/claude-skills",
+  "repo": "alirezarezvani/claude-skills",
+  "ref": null,
+  "subpath": "c-level-advisor/skills/context-engine",
+  "installSource": "alirezarezvani/claude-skills/c-level-advisor/skills/context-engine",
+  "skillName": "context-engine",
+  "scope": "legacy",
+  "installedAt": "2026-05-27T16:42:21.814Z",
+  "updatedAt": "2026-05-27T16:42:21.814Z"
+}
