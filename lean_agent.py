@@ -21,21 +21,23 @@ SYSTEM_PROMPT = (
     "Don't narrate your plan -- act, then give the final answer plainly."
 )
 
-MAX_STEPS = 8  # hard ceiling so a broken tool loop can't run forever / burn tokens
+MAX_STEPS = 8
 
-
-def run(goal: str, allowed_tools: list[str] | None, provider: Provider, model: str | None) -> str:
+def run(goal: str, allowed_tools, provider, model) -> str:
     client = HermesClient(provider=provider, model=model)
     registry = SkillRegistry("skills")
+    messages = [{"role": "user", "content": goal}]
+    return run_turn(client, registry, messages, allowed_tools)
+
+def run_turn(client, registry, messages, allowed_tools) -> str:
     tool_names = allowed_tools or registry.list_all()
     tools = registry.get_openai_tools(tool_names)
-
-    messages = [{"role": "user", "content": goal}]
 
     for step in range(MAX_STEPS):
         resp = client.chat(messages, system=SYSTEM_PROMPT, tools=tools)
 
         if not resp.has_tool_call:
+            messages.append({"role": "assistant", "content": resp.content or ""})
             return resp.content
 
         tool_call_ids = [f"call_{step}_{i}" for i in range(len(resp.tool_calls))]
@@ -67,6 +69,44 @@ def run(goal: str, allowed_tools: list[str] | None, provider: Provider, model: s
 
     return "Stopped after MAX_STEPS without a final answer -- goal likely too broad for the lean path."
 
+def repl(allowed_tools, provider, model) -> None:
+    client = None
+    registry = SkillRegistry("skills")
+    messages = []
+
+    print("mesh -- thin terminal. /tools  /clear  /exit (or Ctrl+D)")
+    while True:
+        try:
+            goal = input("mesh> ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print()
+            break
+
+        if not goal:
+            continue
+        if goal in ("/exit", "/quit"):
+            break
+        if goal == "/tools":
+            print(list_tools())
+            continue
+        if goal == "/clear":
+            messages = []
+            print("context cleared")
+            continue
+
+        if client is None:
+            try:
+                client = HermesClient(provider=provider, model=model)
+            except Exception as e:
+                print(f"ERROR: {e}")
+                continue
+
+        messages.append({"role": "user", "content": goal})
+        try:
+            answer = run_turn(client, registry, messages, allowed_tools)
+        except Exception as e:
+            answer = f"ERROR: {e}"
+        print(answer)
 
 def list_tools() -> str:
     registry = SkillRegistry("skills")
@@ -76,7 +116,6 @@ def list_tools() -> str:
         desc = skill.description.strip().splitlines()[0] if skill and skill.description else ""
         lines.append(f"  {name:<16} {desc}")
     return "\n".join(lines)
-
 
 def main():
     ap = argparse.ArgumentParser(
@@ -103,14 +142,14 @@ def main():
         print(list_tools())
         return
 
+    allowed = args.tools.split(",") if args.tools else None
+
     if not args.goal:
-        ap.print_help()
+        repl(allowed, Provider(args.provider), args.model)
         return
 
-    allowed = args.tools.split(",") if args.tools else None
     answer = run(args.goal, allowed, Provider(args.provider), args.model)
     print(answer)
-
 
 if __name__ == "__main__":
     main()
