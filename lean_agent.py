@@ -5,6 +5,7 @@ The simple version. One model, one tool loop, no orchestrator.
 
 from __future__ import annotations
 import argparse
+import json
 import os
 import sys
 from pathlib import Path
@@ -37,15 +38,35 @@ def run(goal: str, allowed_tools: list[str] | None, provider: Provider, model: s
         if not resp.has_tool_call:
             return resp.content
 
-        messages.append({"role": "assistant", "content": resp.content or ""})
-        for call in resp.tool_calls:
+        # DeepSeek (and OpenAI-compatible APIs generally) require every tool
+        # call to carry an id, and every tool-role reply to echo it back.
+        # hermes_client.py's parsed tool_calls don't include one, so we
+        # manufacture stable ids here -- same workaround the old
+        # agents/base_agent.py used before it was removed.
+        tool_call_ids = [f"call_{step}_{i}" for i in range(len(resp.tool_calls))]
+        messages.append({
+            "role": "assistant",
+            "content": resp.content or "",
+            "tool_calls": [
+                {
+                    "id": tool_call_ids[i],
+                    "type": "function",
+                    "function": {
+                        "name": call["name"],
+                        "arguments": json.dumps(call["arguments"]),
+                    },
+                }
+                for i, call in enumerate(resp.tool_calls)
+            ],
+        })
+        for call_id, call in zip(tool_call_ids, resp.tool_calls):
             try:
                 result = registry.execute(call["name"], call["arguments"])
             except Exception as e:
                 result = f"ERROR: {e}"
             messages.append({
                 "role": "tool",
-                "name": call["name"],
+                "tool_call_id": call_id,
                 "content": str(result),
             })
 
