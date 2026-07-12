@@ -7,3 +7,11 @@ __pycache__/
 hermes_memory.json
 *.zip
 .claude/
+*.mp3
+*.ogg
+*.mp4
+*.png
+*.jpg
+node_modules/
+package.json
+package-lock.json
