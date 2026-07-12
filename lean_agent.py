@@ -38,11 +38,6 @@ def run(goal: str, allowed_tools: list[str] | None, provider: Provider, model: s
         if not resp.has_tool_call:
             return resp.content
 
-        # DeepSeek (and OpenAI-compatible APIs generally) require every tool
-        # call to carry an id, and every tool-role reply to echo it back.
-        # hermes_client.py's parsed tool_calls don't include one, so we
-        # manufacture stable ids here -- same workaround the old
-        # agents/base_agent.py used before it was removed.
         tool_call_ids = [f"call_{step}_{i}" for i in range(len(resp.tool_calls))]
         messages.append({
             "role": "assistant",
@@ -73,13 +68,44 @@ def run(goal: str, allowed_tools: list[str] | None, provider: Provider, model: s
     return "Stopped after MAX_STEPS without a final answer -- goal likely too broad for the lean path."
 
 
+def list_tools() -> str:
+    registry = SkillRegistry("skills")
+    lines = ["Available tools:"]
+    for name in sorted(registry.list_all()):
+        skill = registry.get(name)
+        desc = skill.description.strip().splitlines()[0] if skill and skill.description else ""
+        lines.append(f"  {name:<16} {desc}")
+    return "\n".join(lines)
+
+
 def main():
-    ap = argparse.ArgumentParser(description="Lean AgentMesh: one model, one tool loop.")
-    ap.add_argument("goal", help="What you want done.")
+    ap = argparse.ArgumentParser(
+        prog="mesh",
+        description="Lean AgentMesh: one model, one tool loop. No orchestrator, no ceremony.",
+        epilog=(
+            "Examples:\n"
+            "  mesh \"what's the current price of bitcoin\"\n"
+            "  mesh --tools web_search,run_python \"pull the last 5 HN headlines\"\n"
+            "  mesh --provider anthropic --model claude-sonnet-4-6 \"summarize this repo\"\n"
+            "  mesh --list-tools\n"
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    ap.add_argument("goal", nargs="?", help="What you want done.")
     ap.add_argument("--tools", help="Comma-separated allowed tool names (default: all registered).")
-    ap.add_argument("--provider", default=os.environ.get("AGENTMESH_PROVIDER", "deepseek"))
-    ap.add_argument("--model", default=None)
+    ap.add_argument("--list-tools", action="store_true", help="List available tools and exit.")
+    ap.add_argument("--provider", default=os.environ.get("AGENTMESH_PROVIDER", "deepseek"),
+                     help="deepseek | openrouter | groq | anthropic | gemini | together (default: deepseek)")
+    ap.add_argument("--model", default=None, help="Override the provider's default model.")
     args = ap.parse_args()
+
+    if args.list_tools:
+        print(list_tools())
+        return
+
+    if not args.goal:
+        ap.print_help()
+        return
 
     allowed = args.tools.split(",") if args.tools else None
     answer = run(args.goal, allowed, Provider(args.provider), args.model)
